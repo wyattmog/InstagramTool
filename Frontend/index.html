@@ -39,7 +39,7 @@
                 const res = await fetch(baseUrl + '/login', {
                     method: 'POST',
                     body: formData
-                 
+                  
                 })
                 const result = await res.json(); // Or use .json() if the server responds with JSON
                 window.location.href = 'views/main.html';
