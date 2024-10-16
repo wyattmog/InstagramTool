@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Wyatt Mogelson">
+    <title>Register Page</title>
+</head>
+<body>
+    <div style = "text-align: center;"> 
+        <div>
+            <h1> <img src = "/images/instagram_logo.svg" width="24.004" height="24" title="instagram_logo"> Instagram Unfollower Tool </h1>
+        </div>
+        <hr>
+        <div>
+            <h2>Register</h2>
+        </div>
+        <form>
+            <input type ="text" id = "username">
+            <br><br>
+            <input type ="text" id = "password">
+            <br><br>
+            <button id = "register">Register</button>
+        </form>
+        <script>
+            const registerBtn = document.getElementById("register") 
+            const password = document.getElementById("password")
+            const username = document.getElementById("username")
+            const baseUrl = 'http://localhost:8383'
+
+            registerBtn.addEventListener('click', register)
+
+            async function register(e) {
+                e.preventDefault()
+                const formData = new FormData()
+                formData.append("password", password.value)
+                formData.append("username", username.value)
+                const res = await fetch(baseUrl + '/register', {
+                    method: 'POST',
+                    body: formData
+                
+                })
+                const result = await res.json(); // Or use .json() if the server responds with JSON
+                console.log(result);
+            }
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Wyatt Mogelson">
+    <title>Unfollow Finder</title>
+</head>
+<body>
+    <div style = "text-align: center;"> 
+        <div>
+            <h1> <img src = "/images/instagram_logo.svg" width="24.004" height="24" title="instagram_logo"> Instagram Unfollower Tool </h1>
+        </div>
+        <hr>
+        <div>
+            <p1>Check who unfollowed you with one simple file upload:</p1>
+        </div>
+        <br><br>
+        <form>
+            <div>
+                <label for="fname">Upload File:</label>
+                <input type="file" id="files" name="file" accept = ".html" multiple>
+                <br><br>
+                <button id = "submit">Submit</button>
+                <br><br>
+                <table id = "userTable">
+                    <thead>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+                <h1 id = "output"></h1>
+            </div>
+            <br>
+            <br>
+        </form>
+        <br>
+        <script> 
+            const submitBtn = document.getElementById("submit") 
+            const inputFile = document.getElementById("files")
+            const output = document.getElementById("output")
+            const baseUrl = 'http://localhost:8383'
+            // submitBtn.addEventListener('click', recieveInfo)
+            submitBtn.addEventListener('click', sendInfo)
+            // async function recieveInfo(e) { 
+            //     e.preventDefault()
+            //     const res = await fetch(baseUrl + 'info/wyatt?key=hello', {
+            //         method: 'GET' 
+            //     })
+            //     console.log( res) 
+            //     const data = await res.json()
+            //     output.textContent = data.info
+            // }
+            async function sendInfo(e) {
+                e.preventDefault()
+                if (inputFile.value == '') { return }
+                const formData = new FormData()
+                for (let i=0; i<files.files.length; i++) {
+                    formData.append("files", files.files[i])
+                }
+                console.log(...formData)
+                const res = await fetch(baseUrl + '/uploads', {
+                    method: 'POST',
+                    body: formData
+                
+                })
+                const data = await res.json()
+                // console.log(data)
+                const tableBody = document.querySelector('#userTable tbody');
+                data[0].forEach(user => {
+                    const row = document.createElement('tr');
+                    const cell = document.createElement('td');
+                    cell.textContent = user.id;
+                    row.appendChild(cell);
+                    tableBody.appendChild(row);
+                });
+            }
+        </script>
+    </div>
+</body>
+</html>
