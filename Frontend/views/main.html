@@ -9,7 +9,7 @@
 <body>
     <div style = "text-align: center;"> 
         <div>
-            <h1> <img src = "/images/instagram_logo.svg" width="24.004" height="24" title="instagram_logo"> Instagram Unfollower Tool </h1>
+            <h1> <img src = "/images/instagram_logo.svg" width="24.004" height="24" title="instagram_logo"> Instagram Unfollower Tool <button id = "logout">Logout</button></h1>
         </div>
         <hr>
         <div>
@@ -38,11 +38,16 @@
         <br>
         <script> 
             const submitBtn = document.getElementById("submit") 
+            const logoutBtn = document.getElementById("logout") 
             const inputFile = document.getElementById("files")
             const output = document.getElementById("output")
             const baseUrl = 'http://localhost:8383'
             // submitBtn.addEventListener('click', recieveInfo)
             submitBtn.addEventListener('click', sendInfo)
+            logoutBtn.addEventListener('click', logOut)
+            function logOut(e) {
+                window.location.href = '/index.html';
+            }
             // async function recieveInfo(e) { 
             //     e.preventDefault()
             //     const res = await fetch(baseUrl + 'info/wyatt?key=hello', {

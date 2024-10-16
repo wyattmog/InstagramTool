@@ -11,7 +11,7 @@ const app = express()
 const port = 8383
 
 
-app.use(express.static('/Users/wyattmogelson/Coding/Instagram Tool/Frontend'))
+app.use(express.static('/Users/wyattmogelson/Coding/InstagramTool/Frontend'))
 app.use(express.json())
 
 const storage = multer.diskStorage({
@@ -57,7 +57,7 @@ const uploads = multer({storage: storage})
 // both into respective arrays.
 app.post('/uploads', uploads.array("files"), async (req, res) => {
     await new Promise((resolve, reject) => {
-        fs.readFile("/Users/wyattmogelson/Coding/Instagram Tool/Backend/uploads/followers/followers_1.html", "utf-8", async (err, data) => {
+        fs.readFile("/Users/wyattmogelson/Coding/InstagramTool/Backend/uploads/followers/followers_1.html", "utf-8", async (err, data) => {
             if (err) {
               console.error("Error reading the file:", err);
               return;
@@ -71,7 +71,7 @@ app.post('/uploads', uploads.array("files"), async (req, res) => {
         })
     })
     await new Promise((resolve, reject) => {
-        fs.readFile("/Users/wyattmogelson/Coding/Instagram Tool/Backend/uploads/following/following.html", "utf-8", async (err, data) => {
+        fs.readFile("/Users/wyattmogelson/Coding/InstagramTool/Backend/uploads/following/following.html", "utf-8", async (err, data) => {
             if (err) {
             console.error("Error reading the file:", err);
             return;
