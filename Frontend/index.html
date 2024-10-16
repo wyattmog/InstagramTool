@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Wyatt Mogelson">
+    <title>Login Page</title>
+</head>
+<body>
+    <div style = "text-align: center;"> 
+        <div>
+            <h1> <img src = "/images/instagram_logo.svg" width="24.004" height="24" title="instagram_logo"> Instagram Unfollower Tool </h1>
+        </div>
+        <hr>
+        <div>
+            <h2>Login</h2>
+        </div>
+        <form>
+            <input type ="text" id = "username">
+            <br><br>
+            <input type ="text" id = "password">
+            <br><br>
+            <button id = "login">Login</button>
+            <p>Haven't made an account?</p><a href="views/register.html">Register</a>
+        </form>
+        <script>
+            const loginBtn = document.getElementById("login") 
+            const password = document.getElementById("password")
+            const username = document.getElementById("username")
+            const baseUrl = 'http://localhost:8383'
+
+            loginBtn.addEventListener('click', login)
+
+            async function login(e) {
+                e.preventDefault()
+                const formData = new FormData()
+                formData.append("password", password.value)
+                formData.append("username", username.value)
+                const res = await fetch(baseUrl + '/login', {
+                    method: 'POST',
+                    body: formData
+                 
+                })
+                const result = await res.json(); // Or use .json() if the server responds with JSON
+                console.log(result);
+            }
+        </script>
+    </div>
+</body>
+</html>
