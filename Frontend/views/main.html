@@ -27,7 +27,6 @@
                     <thead>
                     </thead>
                     <tbody>
-
                     </tbody>
                 </table>
                 <h1 id = "output"></h1>
@@ -45,8 +44,14 @@
             // submitBtn.addEventListener('click', recieveInfo)
             submitBtn.addEventListener('click', sendInfo)
             logoutBtn.addEventListener('click', logOut)
-            function logOut(e) {
-                window.location.href = '/index.html';
+            async function logOut(e) {
+                const res = await fetch(baseUrl + '/logout', {
+                    method: 'POST',
+                
+                })
+                if (res.ok) {
+                    window.location.href = '/index.html';
+                }
             }
             // async function recieveInfo(e) { 
             //     e.preventDefault()
@@ -64,19 +69,18 @@
                 for (let i=0; i<files.files.length; i++) {
                     formData.append("files", files.files[i])
                 }
-                console.log(...formData)
+                // console.log(...formData)
                 const res = await fetch(baseUrl + '/uploads', {
                     method: 'POST',
                     body: formData
                 
                 })
                 const data = await res.json()
-                // console.log(data)
                 const tableBody = document.querySelector('#userTable tbody');
                 data[0].forEach(user => {
                     const row = document.createElement('tr');
                     const cell = document.createElement('td');
-                    cell.textContent = user.id;
+                    cell.textContent = user.following_id;
                     row.appendChild(cell);
                     tableBody.appendChild(row);
                 });
