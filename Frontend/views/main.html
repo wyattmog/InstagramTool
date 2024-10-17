@@ -20,7 +20,7 @@
             <div>
                 <label for="fname">Upload File:</label>
                 <input type="file" id="files" name="file" accept = ".html" multiple>
-                <br><br>
+                <p id = "message"><br></p>
                 <button id = "submit">Submit</button>
                 <br><br>
                 <table id = "userTable">
@@ -75,15 +75,36 @@
                     body: formData
                 
                 })
-                const data = await res.json()
-                const tableBody = document.querySelector('#userTable tbody');
-                data[0].forEach(user => {
-                    const row = document.createElement('tr');
-                    const cell = document.createElement('td');
-                    cell.textContent = user.following_id;
-                    row.appendChild(cell);
-                    tableBody.appendChild(row);
-                });
+                if (res.ok) {
+                    const data = await res.json()
+                    const tableBody = document.querySelector('#userTable tbody');
+                    data[0].forEach(user => {
+                        const row = document.createElement('tr');
+                        const cell = document.createElement('td');
+                        cell.textContent = user.following_id;
+                        row.appendChild(cell);
+                        tableBody.appendChild(row);
+                    });
+                }
+                else {
+                    if (res.ok) {
+                        document.getElementById("message").textContent = "Succesfully uploaded"
+                    }
+                    if (res.status === 401) {
+                        document.getElementById("message").textContent = "Page timeout, redirecting to login page"
+                        logOut()
+
+                    }
+                    else if (res.status === 403) {
+                        document.getElementById("message").textContent = "Page timeout, redirecting to login page"
+                        logOut()
+                        
+                    }
+                    else if (res.status === 500) {
+                        // Display file parsing error
+                        document.getElementById("message").textContent = "Error with files, are you sure you uploaded the correct files?"
+                    }
+                }
             }
         </script>
     </div>

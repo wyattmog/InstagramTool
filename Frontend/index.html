@@ -19,7 +19,7 @@
             <input type ="text" id = "username">
             <br><br>
             <input type ="text" id = "password">
-            <br><br>
+            <p id = "message"><br></p>
             <button id = "login">Login</button>
             <p>Haven't made an account?</p><a href="views/register.html">Register</a>
         </form>
@@ -45,9 +45,19 @@
                     window.location.href = 'views/main.html';
                 }
                 else {
-                    const result = await res.json(); // Or use .json() if the server responds with JSON
-                    console.log(result);
+                    if (res.status === 400) {
+                        // Display username or password incorrect
+                        document.getElementById("message").textContent = "Incorrect username or password"
+                    }
+                    else {
+                        document.getElementById("message").textContent = "Error during login, try again later"
+                        // Display error during login, try again later
+                    }
                 }
+                // else {
+                //     const result = await res.json(); // Or use .json() if the server responds with JSON
+    
+                // }
             }
         </script>
     </div>

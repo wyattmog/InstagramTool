@@ -59,11 +59,12 @@ const uploads = multer({storage: storage})
 // For both following and follower links, puts
 // both into respective arrays.
 app.post('/uploads', authenticateToken, uploads.array("files"), async (req, res) => {
+    await deleteColumns(req.user)
     await new Promise((resolve, reject) => {
         fs.readFile("/Users/wyattmogelson/Coding/InstagramTool/Backend/uploads/followers/followers_1.html", "utf-8", async (err, data) => {
             if (err) {
-              console.error("Error reading the file:", err);
-              return;
+            //   console.error("Error reading the file:", err);
+              return res.status(500).send('File parsing error');
             }
             const dom = new JSDOM(data);
             const links = dom.window.document.querySelectorAll("a");
@@ -76,8 +77,8 @@ app.post('/uploads', authenticateToken, uploads.array("files"), async (req, res)
     await new Promise((resolve, reject) => {
         fs.readFile("/Users/wyattmogelson/Coding/InstagramTool/Backend/uploads/following/following.html", "utf-8", async (err, data) => {
             if (err) {
-            console.error("Error reading the file:", err);
-            return;
+                // console.error("Error reading the file:", err);
+                return res.status(500).send('File parsing error');
             }
             const dom = new JSDOM(data);
             const links = dom.window.document.querySelectorAll("a");
@@ -178,7 +179,16 @@ function authenticateToken(req, res, next) {
         next()
     })
 }
-
+function deleteColumns(user) {
+    return pool.query(`
+        DELETE FROM following WHERE user_id = ?
+    `, [user])
+    .then(() => {
+        return pool.query(`
+            DELETE FROM followers WHERE user_id = ?
+        `, [user]);
+    });
+}
 function insertFollowers(name, user){
     return pool.query(`
     INSERT INTO followers (user_id, follower_id)
