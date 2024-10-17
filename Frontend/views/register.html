@@ -19,7 +19,7 @@
             <input type ="text" id = "username">
             <br><br>
             <input type ="text" id = "password">
-            <br><br>
+            <p id = "message"><br></p>
             <button id = "register">Register</button>
         </form>
         <script>
@@ -40,8 +40,22 @@
                     body: formData
                 
                 })
-                const result = await res.json(); // Or use .json() if the server responds with JSON
-                console.log(result);
+                if (res.ok) {
+                    // display registered
+                    document.getElementById("message").textContent = "Succesful Registered"
+                }
+                else {
+                    if (res.status === 400) {
+                        document.getElementById("message").textContent = "Username already taken"
+
+                    }
+                    else {
+                        // Display error during registeration, try again later
+                        document.getElementById("message").textContent = "Error during registration, try again later"
+                    }
+                }
+                // const result = await res.json(); // Or use .json() if the server responds with JSON
+                // console.log(result);
             }
         </script>
     </div>
