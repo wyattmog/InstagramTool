@@ -41,9 +41,13 @@
                     body: formData
                   
                 })
-                const result = await res.json(); // Or use .json() if the server responds with JSON
-                window.location.href = 'views/main.html';
-                console.log(result);
+                if (res.ok) {
+                    window.location.href = 'views/main.html';
+                }
+                else {
+                    const result = await res.json(); // Or use .json() if the server responds with JSON
+                    console.log(result);
+                }
             }
         </script>
     </div>

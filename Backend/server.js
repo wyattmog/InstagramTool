@@ -1,10 +1,12 @@
 const express = require('express')
 const multer = require('multer')
-const jsdom = require('jsdom');
+const jsdom = require('jsdom')
 const fs = require('fs')
 const { JSDOM } = jsdom;
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcryptjs')
 const dotenv = require('dotenv')
+const jwt = require('jsonwebtoken')
+const cookieParser = require('cookie-parser')
 dotenv.config()
 const mysql = require('mysql2')
 const app = express()
@@ -13,6 +15,7 @@ const port = 8383
 
 app.use(express.static('/Users/wyattmogelson/Coding/InstagramTool/Frontend'))
 app.use(express.json())
+app.use(cookieParser())
 
 const storage = multer.diskStorage({
     destination: function(req, file, callback) {
@@ -55,7 +58,7 @@ const uploads = multer({storage: storage})
 // Uses JSDOM to parse and query and get all hyperlink content
 // For both following and follower links, puts
 // both into respective arrays.
-app.post('/uploads', uploads.array("files"), async (req, res) => {
+app.post('/uploads', authenticateToken, uploads.array("files"), async (req, res) => {
     await new Promise((resolve, reject) => {
         fs.readFile("/Users/wyattmogelson/Coding/InstagramTool/Backend/uploads/followers/followers_1.html", "utf-8", async (err, data) => {
             if (err) {
@@ -65,7 +68,7 @@ app.post('/uploads', uploads.array("files"), async (req, res) => {
             const dom = new JSDOM(data);
             const links = dom.window.document.querySelectorAll("a");
             for (let i = 0; i < links.length; i++) {
-                await insertFollowers(links[i].textContent)
+                await insertFollowers(links[i].textContent, req.user)
             }
             resolve()
         })
@@ -79,18 +82,21 @@ app.post('/uploads', uploads.array("files"), async (req, res) => {
             const dom = new JSDOM(data);
             const links = dom.window.document.querySelectorAll("a");
             for (let i = 0; i < links.length; i++) {
-                await insertFollowing(links[i].textContent)
+                await insertFollowing(links[i].textContent, req.user)
                 // insertFollowing(links[i].textContent)
             }
             resolve()
         })
     })  
-    const result = await parse()
+    const result = await parse(req.user)
     // const result = await parse()
-    res.json(result)
+    res.json(result) 
     // res.json({status: 'form data recieved' }) 
 })
-
+app.post('/logout', (req, res) => {
+    res.clearCookie('auth_token'); // Clear the auth_token cookie
+    res.json({ message: 'Logout successful' });
+});
 app.post('/register', uploads.none(), async (req, res) => {
     // console.log(req.body)
     try {
@@ -128,7 +134,14 @@ app.post('/login', uploads.none(), async (req, res) => {
             console.log("wowo")
             return res.status(400).send('Invalid password')
         }
-        res.json('Login successful')
+        const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET)
+        res.cookie('auth_token', accessToken, {
+            httpOnly: true,     // Prevents JavaScript from accessing the cookie (helps prevent XSS)     // Cookie is only sent over HTTPS (use `false` during local development)
+            sameSite: 'Strict', // Prevents the cookie from being sent with cross-site requests (helps prevent CSRF)
+            maxAge: 3600000     // Sets cookie expiration time (1 hour in this example)
+        })
+        console.log("wowow")
+        res.json( {message: "login sucess"})
     } catch (err) {
         console.error('Error during login:', err); // Log the error for debugging
         return res.status(500).send('Database error');
@@ -140,19 +153,35 @@ function insertFollowing(name, user){
     return pool.query(`
     INSERT INTO following (user_id, following_id)
     VALUES (?, ?)
-    `, user, name)
+    `, [user, name])
 }
 
-function parse(){
+function parse(userId){
     return pool.query(`SELECT following_id 
-        FROM following
-        WHERE user_id = ? AND following_id NOT IN (SELECT follower_id FROM followers WHERE user_id = ?);
+    FROM following
+    WHERE user_id = ? AND following_id NOT IN (SELECT follower_id FROM followers WHERE user_id = ?);
     `, [userId, userId])
+}
+
+function authenticateToken(req, res, next) {
+    const token = req.cookies.auth_token
+    // const authHeader = req.headers['authorization']
+    // const token = authHeader && authHeader.split(' ')[1]
+    if (token == null) {
+        return res.sendStatus(401)
+    }
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+        if (err) {
+            return res.sendStatus(403)
+        }
+        req.user = user
+        next()
+    })
 }
 
 function insertFollowers(name, user){
     return pool.query(`
     INSERT INTO followers (user_id, follower_id)
     VALUES (?, ?)
-    `, user, name)
+    `, [user, name])
 }
