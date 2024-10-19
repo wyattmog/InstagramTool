@@ -5,23 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Wyatt Mogelson">
     <title>Login Page</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div style = "text-align: center;"> 
         <div>
-            <h1> <img src = "/images/instagram_logo.svg" width="24.004" height="24" title="instagram_logo"> Instagram Unfollower Tool </h1>
+            <h1 class = "font"> <img src = "/images/instagram_logo.svg" width="24.004" height="24" title="instagram_logo"> Instagram Unfollower Tool </h1>
         </div>
         <hr>
-        <div>
-            <h2>Login</h2>
+        <div class = "form-box">
+            <div class = "button-box">
+                <div id="switch-btn"></div>
+                <button class = "toggle-btn" id = "to-login" onclick="toLogin()">Login</button>
+                <button class =  "toggle-btn" id = "to-register" onclick="toRegister()">Register</button>
         </div>
-        <form>
-            <input type ="text" id = "username">
+        <!-- <div>
+            <h2>Login</h2>
+        </div> -->
+        <form id = "login-screen" class="input-group">
+            <input class = "input-field", type ="text" id = "username" placeholder="Enter Username">
             <br><br>
-            <input type ="text" id = "password">
-            <p id = "message"><br></p>
-            <button id = "login">Login</button>
-            <p>Haven't made an account?</p><a href="views/register.html">Register</a>
+            <input class = "input-field" type ="text" id = "password" placeholder="Enter Password">
+            <p class = "font" id = "message"><br></p>
+            <input type="checkbox" class="check-box"><span>Keep me logged in</span>
+            <button class = "login-btn" id = "login">Login</button>
+            <!-- <p>Haven't made an account?</p><a href="views/register.html">Register</a> -->
+        </form>
+        <form id = "register-screen" class="input-group">
+            <input class = "input-field", type ="text" id = "username" placeholder="Enter New Username">
+            <br><br>
+            <input class = "input-field" type ="text" id = "password" placeholder="Enter New Password">
+            <p class = "font" id = "message"><br></p>
+            <input type="checkbox" class="check-box"><span>I agree to the terms & conditions</span>
+            <button class = "login-btn" id = "register">Register</button>
         </form>
         <script>
             const loginBtn = document.getElementById("login") 
@@ -31,9 +47,26 @@
 
             loginBtn.addEventListener('click', login)
 
+            var login_screen = document.getElementById("login-screen")
+            var register_screen = document.getElementById("register-screen") 
+            var switchBtn = document.getElementById("switch-btn") 
+            function toRegister(){
+                login_screen.style.left = "-400px"
+                register_screen.style.left = "50px"
+                switchBtn.style.left = "110px"
+            }
+            function toLogin(){
+                login_screen.style.left = "50px"
+                register_screen.style.left = "450px"
+                switchBtn.style.left = "0px"
+            }
             async function login(e) {
                 e.preventDefault()
                 const formData = new FormData()
+                if (!username.value || !password.value) {
+                    document.getElementById("message").textContent = "Incorrect username or password"
+                    return;
+                }
                 formData.append("password", password.value)
                 formData.append("username", username.value)
                 const res = await fetch(baseUrl + '/login', {
