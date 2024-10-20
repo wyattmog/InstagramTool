@@ -104,6 +104,7 @@ app.post('/register', uploads.none(), async (req, res) => {
         const { username, password } = req.body;
         const result = await pool.query('SELECT username FROM users WHERE username = ?', [username])
         if (result[0].length > 0) {
+            console.log(req.body)
             return res.status(400).send('Username already taken')
         }
         const hashedPassword = await bcrypt.hash(password, 10)
@@ -132,7 +133,6 @@ app.post('/login', uploads.none(), async (req, res) => {
         const user = result[0];
         const isMatch = await bcrypt.compare(password, user[0].password);
         if (!isMatch) {
-            console.log("wowo")
             return res.status(400).send('Invalid password')
         }
         const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET)
@@ -141,7 +141,6 @@ app.post('/login', uploads.none(), async (req, res) => {
             sameSite: 'Strict', // Prevents the cookie from being sent with cross-site requests (helps prevent CSRF)
             maxAge: 3600000     // Sets cookie expiration time (1 hour in this example)
         })
-        console.log("wowow")
         res.json( {message: "login sucess"})
     } catch (err) {
         console.error('Error during login:', err); // Log the error for debugging
