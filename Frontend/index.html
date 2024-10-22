@@ -13,12 +13,12 @@
             <h1 class = "header-text"> <img src = "/images/instagram_logo.svg" width="24.004" height="24" title="instagram_logo"> Instagram Unfollower Tool </h1>
         </div>
         <div class = "form-box">
-            <div class = "button-box">
+            <div class = "button-box transition">
                 <div id="switch-btn"></div>
                 <button class = "toggle-btn" id = "to-login" onclick="toLogin()">Login</button>
                 <button class =  "toggle-btn" id = "to-register" onclick="toRegister()">Register</button>
             </div>
-        <form id = "login-screen" class="input-group">
+        <form id = "login-screen" class="input-group transition">
             <input class = "input-field", type ="text" id = "login-username" placeholder="Enter Username" required>
             <br><br>
             <input class = "input-field" type ="text" id = "login-password" placeholder="Enter Password" required>
@@ -27,7 +27,7 @@
             <button class = "submit-btn" id = "login">Login</button>
             <!-- <p>Haven't made an account?</p><a href="views/register.html">Register</a> -->
         </form>
-        <form id = "register-screen" class="input-group">
+        <form id = "register-screen" class="input-group transition">
             <input class = "input-field", type ="text" id = "register-username" placeholder="Enter New Username">
             <br><br>
             <input class = "input-field" type ="text" id = "register-password" placeholder="Enter New Password">
@@ -43,10 +43,41 @@
             const loginPassword = document.getElementById("login-password");
             const loginUsername = document.getElementById("login-username");
             const baseUrl = 'http://localhost:8383';
-
             loginBtn.addEventListener('click', login);
             registerBtn.addEventListener('click', register);
 
+            function spawnHeart(event){
+                const newHeart = document.createElement('div');
+                newHeart.classList.add('heart')
+                // const x = event.clientX; // X coordinate of the click
+                // const y = event.clientY;
+                // console.log(x,y)
+                // newHeart.style.left = x + 'px';
+                // newHeart.style.top = y + 'px';
+                newHeart.style.left = Math.random() * window.innerWidth + 'px';
+                newHeart.style.top = Math.random() * window.innerHeight + 'px';
+                document.getElementById("heart-loc").appendChild(newHeart);
+
+                setTimeout(() => {
+                newHeart.classList.add('hidden');
+                // Optional: remove from DOM after it is invisible
+                setTimeout(() => newHeart.remove(), 500); 
+                }, 3500);
+            }
+
+            // document.addEventListener('click', spawnHeart);
+            function startSpawning() {
+
+                // Spawn 3 divs every second
+                intervalId = setInterval(() => {
+                for (let i = 0; i < 1; i++) {
+                    spawnHeart();
+                }
+                }, 400); // 1000 ms = 1 second
+            }
+            window.onload = function() {
+                startSpawning();
+            };
             var login_screen = document.getElementById("login-screen");
             var register_screen = document.getElementById("register-screen");
             var switchBtn = document.getElementById("switch-btn");
@@ -60,7 +91,18 @@
                 register_screen.style.left = "450px";
                 switchBtn.style.left = "0px";
             };
+            function transition(){
+                console.log("WOWOWOWW")
+                const heartElements = document.querySelectorAll('.heart');
+                const bodyElements = document.querySelectorAll('.transition');
+                heartElements.forEach(element => {
+                    element.style.opacity = 0;
+                });
+                bodyElements.forEach(element => {
+                    element.classList.add('fade');
+                })
 
+            }
             async function register(e) {
                 e.preventDefault();
                 if (!registerUsername.value || !registerPassword.value) {
@@ -107,7 +149,11 @@
                   
                 });
                 if (res.ok) {
-                    window.location.href = 'views/main.html';
+                    transition();
+                    clearInterval(intervalId);
+                    setTimeout(() => {
+                        window.location.href = 'views/main.html';
+                    }, 200); // 1000 ms = 1 second
                 }
                 else {
                     if (res.status === 400) {
@@ -122,6 +168,8 @@
             };
         </script>
     </div>
-    <div id = "heart"></div>
+    <div class = "heart-transition" id = "heart-loc">
+
+    </div>
 </body>
 </html>

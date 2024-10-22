@@ -12,7 +12,7 @@
         <div class = "header">
             <div class="header-white-space"></div>
             <h1 class = "header-text"> <img src = "/images/instagram_logo.svg" width="24.004" height="24" title="instagram_logo"> Instagram Unfollower Tool </h1>
-            <button class="logout-btn" id = "logout-btn">Logout</button>
+            <button class="logout-btn transition" id = "logout-btn">Logout</button>
         </div>
         <div class = "form-box">
             <!-- <div class = "button-box">
@@ -20,19 +20,41 @@
                 <button class = "toggle-btn" id = "to-login" onclick="toLogin()">Login</button>
                 <button class =  "toggle-btn" id = "to-register" onclick="toRegister()">Register</button>
             </div> -->
-            <div class = "button-box">
+            <div class = "button-box transition">
                 <div id="switch-btn"></div>
                 <button class = "toggle-btn" id = "to-login" onclick="toUpload()">Upload</button>
                 <button class =  "toggle-btn" id = "to-register" onclick="toOutput()">Output</button>
             </div>
         </form>
-            <form id = "login-screen" class="input-group upload-btns">
+            <form id = "login-screen" class="input-group upload-btns transition">
                 <input class="file-field" type="file" id="files" name="file" accept = ".html" multiple>
                 <label id = "upload-label"for = "files">Upload Files</label>
-                <p id = "message"><br><br></p>
+                <div class = "progress-bars">
+                    <div class="progress-bar">
+                        <img src = "/images/file-1453.svg" width="31" height="36">
+                        <div class = "progress-text">
+                                <div style="display:flex; flex-direction: row; gap:20px;">
+                                    <p id = "file1">Followers.html &#x2022; Uploaded</p>
+                                    <p>90</p>
+                                </div>
+                                <progress></progress>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <img src = "/images/file-1453.svg" width="31" height="36">
+                        <div class = "progress-text">
+                            <div style="display:flex; flex-direction: row; gap:20px;">
+                                <p id = "file2">Following.html &#x2022; Uploaded</p>
+                                <p>90</p>
+                            </div>
+                            <progress></progress>
+                        </div>
+                    </div>
+                </div>
+                <p id = "message"><br></p>
                 <button class = "submit-btn"id = "submit">Submit</button>
             </form>
-            <form id = "register-screen" class="input-group">
+            <form id = "register-screen" class="input-group transition">
                 <table id = "userTable">
                     <thead>
                     </thead>
@@ -100,10 +122,24 @@
                 
                 })
                 if (res.ok) {
-                    window.location.href = '/index.html';
+                    transition();
+                    clearInterval(intervalId);
+                    setTimeout(() => {
+                        window.location.href = '/index.html';
+                    }, 200); // 1000 ms = 1 second
                 }
             }
-
+            function transition(){
+                console.log("WOWOWOWW")
+                const heartElements = document.querySelectorAll('.heart');
+                const bodyElements = document.querySelectorAll('.transition');
+                heartElements.forEach(element => {
+                    element.style.opacity = 0;
+                });
+                bodyElements.forEach(element => {
+                    element.classList.add('fade');
+                })
+            }
             function toOutput(){
                 login_screen.style.left = "-400px";
                 register_screen.style.left = "50px";
@@ -113,6 +149,38 @@
                 login_screen.style.left = "50px";
                 register_screen.style.left = "450px";
                 switchBtn.style.left = "0px";
+            };
+            function spawnHeart(event){
+                const newHeart = document.createElement('div');
+                newHeart.classList.add('heart')
+                // const x = event.clientX; // X coordinate of the click
+                // const y = event.clientY;
+                // console.log(x,y)
+                // newHeart.style.left = x + 'px';
+                // newHeart.style.top = y + 'px';
+                newHeart.style.left = Math.random() * window.innerWidth + 'px';
+                newHeart.style.top = Math.random() * window.innerHeight + 'px';
+                document.getElementById("heart-loc").appendChild(newHeart);
+
+                setTimeout(() => {
+                newHeart.classList.add('hidden');
+                // Optional: remove from DOM after it is invisible
+                setTimeout(() => newHeart.remove(), 500); 
+                }, 3500);
+            }
+
+            // document.addEventListener('click', spawnHeart);
+            function startSpawning() {
+
+                // Spawn 3 divs every second
+                intervalId = setInterval(() => {
+                for (let i = 0; i < 1; i++) {
+                    spawnHeart();
+                }
+                }, 400); // 1000 ms = 1 second
+            }
+            window.onload = function() {
+                startSpawning();
             };
             // async function recieveInfo(e) { 
             //     e.preventDefault()
@@ -168,6 +236,9 @@
                 }
             }
         </script>
+    </div>
+    <div class = "heart-transition" id = "heart-loc"></div>
+
     </div>
 </body>
 </html>
