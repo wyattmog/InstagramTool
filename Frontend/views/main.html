@@ -27,27 +27,27 @@
             </div>
         </form>
             <form id = "login-screen" class="input-group upload-btns transition">
-                <input class="file-field" type="file" id="files" name="file" accept = ".html" multiple>
-                <label id = "upload-label"for = "files">Upload Files</label>
+                <input class="file-field" onchange = "uploadFiles()" type="file" id="files" name="file" accept = ".html" multiple>
+                <label id = "upload-label" for = "files">Upload Files</label>
                 <div class = "progress-bars">
                     <div class="progress-bar">
                         <img src = "/images/file-1453.svg" width="31" height="36">
                         <div class = "progress-text">
-                                <div style="display:flex; flex-direction: row; gap:20px;">
-                                    <p id = "file1">Followers.html &#x2022; Uploaded</p>
-                                    <p>90</p>
+                                <div style="display:flex; flex-direction: row; gap:30px; font-size: small;">
+                                    <p id = "file1-status" style="flex: 0 0 150px; text-align: left;">Followers.html &#x2022; Uploaded</p>
+                                    <p id = "file1-percent"style="text-align: right;"></p>
                                 </div>
-                                <progress></progress>
+                                <progress id = file1-bar style="width: 215px;" max = "100" value = "0"></progress>
                         </div>
                     </div>
                     <div class="progress-bar">
                         <img src = "/images/file-1453.svg" width="31" height="36">
                         <div class = "progress-text">
-                            <div style="display:flex; flex-direction: row; gap:20px;">
-                                <p id = "file2">Following.html &#x2022; Uploaded</p>
-                                <p>90</p>
+                            <div style="display:flex; flex-direction: row; gap:30px; font-size: small;">
+                                <p id = "file2-status" style="flex: 0 0 150px; text-align: left;">Following.html &#x2022; Uploaded</p>
+                                <p id = "file2-percent" style="text-align: right;"></p>
                             </div>
-                            <progress></progress>
+                            <progress id = file2-bar style="width: 215px;" max = "100" value = "0" ></progress>
                         </div>
                     </div>
                 </div>
@@ -115,7 +115,39 @@
             // submitBtn.addEventListener('click', recieveInfo)
             submitBtn.addEventListener('click', sendInfo)
             logoutBtn.addEventListener('click', logOut)
-            
+            function uploadFiles() {
+                for (let i = 0; i < 2; i++) {
+                    calcProgress(inputFile.files[i], i+1)
+                }
+            }
+            function displayProgress(percentComplete, file_num){
+                console.log(file_num)
+                const progressStatus = document.getElementById('file'+ file_num + '-percent');
+                const progressBar = document.getElementById('file'+file_num+"-bar")
+                progressBar.value = percentComplete
+                progressStatus.textContent = Math.round(percentComplete) + '%'; // Update text
+            }
+            function calcProgress(file, file_num) {
+                const statusBar = document.getElementById('file' + file_num + '-status');
+                statusBar.textContent = "Uploading..."
+                const totalSize = file.size;
+                let uploadedSize = 0;
+                const interval = setInterval(() => {
+                    if (uploadedSize < totalSize) {
+                        uploadedSize += 10000;
+                        if (uploadedSize > totalSize) {
+                            uploadedSize = totalSize; // Prevent exceeding total size
+                        }
+                        const percentComplete = (uploadedSize / totalSize) * 100; // Calculate progress
+                        displayProgress(percentComplete, file_num); // Update the progress bar
+                    } else {
+                        clearInterval(interval); // Stop the interval when upload is complete
+                        const statusBar = document.getElementById('file' + file_num + '-status');
+                        statusBar.textContent = file.name + " • Uploaded"
+                        displayProgress(0); // Reset progress bar
+                    }
+                }, 200)
+            }
             async function logOut(e) {
                 const res = await fetch(baseUrl + '/logout', {
                     method: 'POST',
@@ -179,8 +211,21 @@
                 }
                 }, 400); // 1000 ms = 1 second
             }
-            window.onload = function() {
-                startSpawning();
+            window.onload = async function() {
+                const res = await fetch('/protected', { credentials: 'include' })
+                if (res.status === 401) {
+                    // User is not authenticated
+                    // alert('You are not authorized to access this page.');
+                    window.location.href = '/index.html'; // Redirect to login page
+                } else if (res.status === 403) {
+                    // Token is invalid (could be expired)
+                    // alert('Access forbidden. Please log in again.');
+                    window.location.href = '/index.html'; // Redirect to login page
+                } else if (res.ok) {
+                    // User is authenticated; proceed normally
+                    console.log('User is authenticated.');
+                    startSpawning();
+                }
             };
             // async function recieveInfo(e) { 
             //     e.preventDefault()

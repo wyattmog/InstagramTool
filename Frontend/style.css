@@ -182,6 +182,7 @@ input[type="file"]{
 .progress-bars {
     display:flex;
     flex-direction: column;
+    width:100%;
 }
 .progress-bar{
     padding: 10px;
