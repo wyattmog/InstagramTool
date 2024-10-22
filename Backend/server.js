@@ -119,10 +119,15 @@ app.post('/register', uploads.none(), async (req, res) => {
         return res.status(500).send('Database error');
     }
 })
-
+app.get('/protected', authenticateToken, (req, res) => {
+    res.sendStatus(200);
+});
 app.post('/login', uploads.none(), async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const username = req.body.username;
+        const password = req.body.password; 
+        const remember = req.body.remember;     
+
         // Find the user by username
         const result = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
         if (result[0].length === 0) {
@@ -136,10 +141,11 @@ app.post('/login', uploads.none(), async (req, res) => {
             return res.status(400).send('Invalid password')
         }
         const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET)
+        const maxAges = String(remember) == "true" ? 604800000 : 3600000;
         res.cookie('auth_token', accessToken, {
             httpOnly: true,     // Prevents JavaScript from accessing the cookie (helps prevent XSS)     // Cookie is only sent over HTTPS (use `false` during local development)
             sameSite: 'Strict', // Prevents the cookie from being sent with cross-site requests (helps prevent CSRF)
-            maxAge: 3600000     // Sets cookie expiration time (1 hour in this example)
+            maxAge: maxAges     // Sets cookie expiration time 
         })
         res.json( {message: "login sucess"})
     } catch (err) {
