@@ -45,12 +45,15 @@ const pool = mysql.createPool({
 const uploads = multer({storage: storage})
 // This communicates from backend to front end
 // Will use to display information after processing in sql
-// app.get('/info/:dynamic', (req,res) => {
-//     const { dynamic } = req.params
-//     const { key } = req.query
-//     console.log(dynamic, key)
-//     res.status(200).json({info: 'preset text'})
-// })
+app.get('/data', authenticateToken, async (req,res) => {
+    const result = await parse(req.user)
+    if (result[0].length === 0) {
+        return res.status(400).send('Records not found');
+    }
+    else {
+        res.json(result)
+    }
+})
 
 // Recieves post request from frontend
 // Puts followers file in /followers directory

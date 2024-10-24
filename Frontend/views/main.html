@@ -27,10 +27,13 @@
             </div>
         </form>
             <form id = "login-screen" class="input-group upload-btns transition">
-                <input class="file-field" onchange = "uploadFiles()" type="file" id="files" name="file" accept = ".html" multiple>
-                <label id = "upload-label" for = "files">Upload Files</label>
+                <div style="display:flex; flex-direction: row; gap:5px;">
+                    <label style = "height:36px;" id = "upload-label" for = "files">Upload</label>
+                    <input class="file-field" onchange = "uploadFiles()" type="file" id="files" name="file" accept = ".html" multiple>
+                    <button class = "submit-btn" style = "height:36px;" id = "getInfo">Get</button>
+                </div>
                 <div class = "progress-bars">
-                    <div class="progress-bar">
+                    <div id = "progress-bar1" class="progress-bar" style="visibility: hidden;">
                         <img src = "/images/file-1453.svg" width="31" height="36">
                         <div class = "progress-text">
                                 <div style="display:flex; flex-direction: row; gap:30px; font-size: small;">
@@ -40,7 +43,7 @@
                                 <progress id = file1-bar style="width: 215px;" max = "100" value = "0"></progress>
                         </div>
                     </div>
-                    <div class="progress-bar">
+                    <div id = "progress-bar2" class="progress-bar" style="visibility: hidden;">
                         <img src = "/images/file-1453.svg" width="31" height="36">
                         <div class = "progress-text">
                             <div style="display:flex; flex-direction: row; gap:30px; font-size: small;">
@@ -51,16 +54,18 @@
                         </div>
                     </div>
                 </div>
-                <p id = "message"><br></p>
                 <button class = "submit-btn"id = "submit">Submit</button>
+                <p id = "message"></p>
             </form>
             <form id = "register-screen" class="input-group transition">
-                <table id = "userTable">
-                    <thead>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
+                <div class="scroll-div">
+                    <table id = "userTable" style="display: flex; justify-content: center;align-items: center; gap:2px">
+                        <thead>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
             </form>
         </form>
                 <!-- <table id = "userTable">
@@ -107,23 +112,28 @@
             const submitBtn = document.getElementById("submit") 
             const logoutBtn = document.getElementById("logout-btn") 
             const inputFile = document.getElementById("files")
+            const getBtn = document.getElementById("getInfo")
             const output = document.getElementById("output")
             var switchBtn = document.getElementById("switch-btn");
             var login_screen = document.getElementById("login-screen");
             var register_screen = document.getElementById("register-screen");
             const baseUrl = 'http://localhost:8383'
-            // submitBtn.addEventListener('click', recieveInfo)
+            getBtn.addEventListener('click', recieveInfo)
             submitBtn.addEventListener('click', sendInfo)
             logoutBtn.addEventListener('click', logOut)
+            function getInfo() {
+
+            }
             function uploadFiles() {
                 for (let i = 0; i < 2; i++) {
                     calcProgress(inputFile.files[i], i+1)
                 }
             }
             function displayProgress(percentComplete, file_num){
-                console.log(file_num)
+                const fileBox = document.getElementById('progress-bar' + file_num)
                 const progressStatus = document.getElementById('file'+ file_num + '-percent');
                 const progressBar = document.getElementById('file'+file_num+"-bar")
+                fileBox.style.visibility = "visible"
                 progressBar.value = percentComplete
                 progressStatus.textContent = Math.round(percentComplete) + '%'; // Update text
             }
@@ -227,15 +237,32 @@
                     startSpawning();
                 }
             };
-            // async function recieveInfo(e) { 
-            //     e.preventDefault()
-            //     const res = await fetch(baseUrl + 'info/wyatt?key=hello', {
-            //         method: 'GET' 
-            //     })
-            //     console.log( res) 
-            //     const data = await res.json()
-            //     output.textContent = data.info
-            // }
+            async function recieveInfo(e) { 
+                e.preventDefault()
+                const res = await fetch(baseUrl + '/data', {
+                    method: 'GET' 
+                })
+                if (res.ok) {
+                    const data = await res.json()
+                    const tableBody = document.querySelector('#userTable tbody');
+                    data[0].forEach(user => {
+                        const row = document.createElement('tr');
+                        const cell = document.createElement('td');
+                        const img = document.createElement('td');
+                        img.innerHTML = `<img src="/images/user.svg" width="36" height="36" alt="User Icon">`;
+                        cell.textContent = user.following_id
+
+                        // Append the image to the cell
+                        // cell.textContent = user.following_id;
+                        row.appendChild(img);
+                        row.appendChild(cell);
+                        tableBody.appendChild(row);
+                    });
+                }
+                // console.log( res) 
+                // const data = await res.json()
+                // output.textContent = data.info
+            }
             async function sendInfo(e) {
                 e.preventDefault()
                 if (inputFile.value == '') { return }
@@ -255,7 +282,13 @@
                     data[0].forEach(user => {
                         const row = document.createElement('tr');
                         const cell = document.createElement('td');
-                        cell.textContent = user.following_id;
+                        const img = document.createElement('td');
+                        img.innerHTML = `<img src="/images/user.svg" width="36" height="36" alt="User Icon">`;
+                        cell.textContent = user.following_id
+
+                        // Append the image to the cell
+                        // cell.textContent = user.following_id;
+                        row.appendChild(img);
                         row.appendChild(cell);
                         tableBody.appendChild(row);
                     });

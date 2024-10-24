@@ -94,15 +94,16 @@ input[type="file"]{
     display: none;
 }
 #upload-label{
-    display: inline-block;
+    display: flex; /* Use flexbox */
+    justify-content: center; /* Center text horizontally */
+    align-items: center;
     background: linear-gradient(to right, #F58529, #DD2A7B, #8134AF);
     border-radius:30px;
-    width: 55%;
-    padding: 10px 30px;
+    width: 70%;
+    padding: 0px 60px;
     cursor: pointer;
-    display: block;
     margin: auto;
-
+    
 }
 .logout-btn{
     background: linear-gradient(to right, #F58529, #DD2A7B, #8134AF);
@@ -183,18 +184,38 @@ input[type="file"]{
     display:flex;
     flex-direction: column;
     width:100%;
+    gap: 10px;
 }
 .progress-bar{
+    background-color: rgb(128, 128, 128, 0.05);
     padding: 10px;
     gap:5px;
     display:flex;
     flex-direction:row;
 }
+progress {
+    border-radius: 6px; 
+    /* width: 80%; */
+    height: 8px;
+    /* margin-left: -11.5%; */
+    box-shadow: 1px 1px 4px rgba( 0, 0, 0, 0.2 );
+}
+progress::-webkit-progress-value {
+background-color: #8134AF;
+}
+.scroll-div{
+    overflow-y: auto;
+    max-height: 240px; 
+    /* background-color: rgb(128, 128, 128, 0.05); */
+}
 .progress-text{
-    gap:5px;
+    gap:10px;
     display:flex;
     flex-direction:column;
 }
+table {
+    border-spacing: 0px;
+  }
 @keyframes transitionIn {
     from {
         opacity: 0;
