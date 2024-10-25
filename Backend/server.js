@@ -23,7 +23,10 @@ const storage = multer.diskStorage({
             callback(null, __dirname + "/uploads/following")
         }
         else if (file.originalname == 'followers_1.html') {
-        callback(null, __dirname + "/uploads/followers")
+            callback(null, __dirname + "/uploads/followers")
+        }
+        else {
+            callback(Error)
         }
     },
     filename: function(req, file, callback) {
@@ -54,7 +57,16 @@ app.get('/data', authenticateToken, async (req,res) => {
         res.json(result)
     }
 })
-
+app.use((err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        // A Multer error occurred when uploading.
+        return res.status(400).send('An error occurred during the file upload.'); // Send a generic error message
+    } else if (err) {
+        // An unknown error occurred when uploading.
+        return res.status(400).send('An error occurred during the request.'); // Send a generic error message
+    }
+    next();
+});
 // Recieves post request from frontend
 // Puts followers file in /followers directory
 // Puts following file in /following directory
@@ -63,51 +75,69 @@ app.get('/data', authenticateToken, async (req,res) => {
 // both into respective arrays.
 app.post('/uploads', authenticateToken, uploads.array("files"), async (req, res) => {
     await deleteColumns(req.user)
-    await new Promise((resolve, reject) => {
-        fs.readFile("/Users/wyattmogelson/Coding/InstagramTool/Backend/uploads/followers/followers_1.html", "utf-8", async (err, data) => {
-            if (err) {
-            //   console.error("Error reading the file:", err);
-              return res.status(500).send('File parsing error');
-            }
-            const dom = new JSDOM(data);
-            const links = dom.window.document.querySelectorAll("a");
-            for (let i = 0; i < links.length; i++) {
-                await insertFollowers(links[i].textContent, req.user)
-            }
-            resolve()
+    try {
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).send('No files uploaded or invalid file type.');
+        }
+        await new Promise((resolve, reject) => {
+            fs.readFile("/Users/wyattmogelson/Coding/InstagramTool/Backend/uploads/followers/followers_1.html", "utf-8", async (err, data) => {
+                if (err) {
+                //   console.error("Error reading the file:", err);
+                    reject()
+                    return res.status(500).send('File parsing error');
+                }
+                const dom = new JSDOM(data);
+                const links = dom.window.document.querySelectorAll("a");
+                for (let i = 0; i < links.length; i++) {
+                    await insertFollowers(links[i].textContent, req.user)
+                }
+                resolve()
+            })
         })
-    })
-    await new Promise((resolve, reject) => {
-        fs.readFile("/Users/wyattmogelson/Coding/InstagramTool/Backend/uploads/following/following.html", "utf-8", async (err, data) => {
-            if (err) {
-                // console.error("Error reading the file:", err);
-                return res.status(500).send('File parsing error');
-            }
-            const dom = new JSDOM(data);
-            const links = dom.window.document.querySelectorAll("a");
-            for (let i = 0; i < links.length; i++) {
-                await insertFollowing(links[i].textContent, req.user)
-                // insertFollowing(links[i].textContent)
-            }
-            resolve()
-        })
-    })  
-    const result = await parse(req.user)
-    // const result = await parse()
-    res.json(result) 
-    // res.json({status: 'form data recieved' }) 
-})
+        await new Promise((resolve, reject) => {
+            fs.readFile("/Users/wyattmogelson/Coding/InstagramTool/Backend/uploads/following/following.html", "utf-8", async (err, data) => {
+                if (err) {
+                    // console.error("Error reading the file:", err);
+                    reject()
+                    return res.status(500).send('File parsing error');
+                }
+                const dom = new JSDOM(data);
+                const links = dom.window.document.querySelectorAll("a");
+                for (let i = 0; i < links.length; i++) {
+                    await insertFollowing(links[i].textContent, req.user)
+                    // insertFollowing(links[i].textContent)
+                }
+                resolve()
+            })
+        })  
+        const result = await parse(req.user)
+        // const result = await parse()
+        res.json(result) 
+    }
+    catch(err) {
+        return res.status(500).send('Upload error');
+    }}, (err, req, res, next) => {
+        if (err instanceof multer.MulterError) {
+            // A Multer error occurred when uploading.
+            return res.status(500).send('An error occurred during the file upload.'); // Send a generic error message
+        } else if (err) {
+            // An unknown error occurred when uploading.
+            return res.status(500).send('An error occurred during the request.'); // Send a generic error message
+        } else {
+          // Handle other errors
+          return res.status(500).json({ error: 'Internal server error' });
+        }
+    }// res.json({status: 'form data recieved' }) 
+)
 app.post('/logout', (req, res) => {
     res.clearCookie('auth_token'); // Clear the auth_token cookie
     res.json({ message: 'Logout successful' });
 });
 app.post('/register', uploads.none(), async (req, res) => {
-    // console.log(req.body)
     try {
         const { username, password } = req.body;
         const result = await pool.query('SELECT username FROM users WHERE username = ?', [username])
         if (result[0].length > 0) {
-            console.log(req.body)
             return res.status(400).send('Username already taken')
         }
         const hashedPassword = await bcrypt.hash(password, 10)

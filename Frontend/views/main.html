@@ -11,7 +11,7 @@
     <div style = "text-align: center;"> 
         <div class = "header">
             <div class="header-white-space"></div>
-            <h1 class = "header-text"> <img src = "/images/instagram_logo.svg" width="24.004" height="24" title="instagram_logo"> Instagram Unfollower Tool </h1>
+            <h1 class = "header-text"> <img src = "/images/instagram_logo.svg" width="24.004" height="24" title="instagram_logo"style="width:1em;height:1em;"> UnfollowersTracker</h1>
             <button class="logout-btn transition" id = "logout-btn">Logout</button>
         </div>
         <div class = "form-box">
@@ -37,7 +37,7 @@
                         <img src = "/images/file-1453.svg" width="31" height="36">
                         <div class = "progress-text">
                                 <div style="display:flex; flex-direction: row; gap:30px; font-size: small;">
-                                    <p id = "file1-status" style="flex: 0 0 150px; text-align: left;">Followers.html &#x2022; Uploaded</p>
+                                    <p id = "file1-status" style="flex: 0 0 150px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Followers.html &#x2022; Uploaded</p>
                                     <p id = "file1-percent"style="text-align: right;"></p>
                                 </div>
                                 <progress id = file1-bar style="width: 215px;" max = "100" value = "0"></progress>
@@ -47,7 +47,7 @@
                         <img src = "/images/file-1453.svg" width="31" height="36">
                         <div class = "progress-text">
                             <div style="display:flex; flex-direction: row; gap:30px; font-size: small;">
-                                <p id = "file2-status" style="flex: 0 0 150px; text-align: left;">Following.html &#x2022; Uploaded</p>
+                                <p id = "file2-status" style="flex: 0 0 150px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Following.html &#x2022; Uploaded</p>
                                 <p id = "file2-percent" style="text-align: right;"></p>
                             </div>
                             <progress id = file2-bar style="width: 215px;" max = "100" value = "0" ></progress>
@@ -117,6 +117,7 @@
             var switchBtn = document.getElementById("switch-btn");
             var login_screen = document.getElementById("login-screen");
             var register_screen = document.getElementById("register-screen");
+            let uploaded_files = [];
             const baseUrl = 'http://localhost:8383'
             getBtn.addEventListener('click', recieveInfo)
             submitBtn.addEventListener('click', sendInfo)
@@ -125,7 +126,14 @@
 
             }
             function uploadFiles() {
-                for (let i = 0; i < 2; i++) {
+                if (inputFile.files.length > 2) {
+                    alert("You uploaded too many files. Only upload two files.")
+                    return
+                }
+                else if (inputFile.files.length == 0) {
+                    return
+                }
+                for (let i = 0; i < inputFile.files.length; i++) {
                     calcProgress(inputFile.files[i], i+1)
                 }
             }
@@ -144,7 +152,7 @@
                 let uploadedSize = 0;
                 const interval = setInterval(() => {
                     if (uploadedSize < totalSize) {
-                        uploadedSize += 10000;
+                        uploadedSize += 100000;
                         if (uploadedSize > totalSize) {
                             uploadedSize = totalSize; // Prevent exceeding total size
                         }
@@ -153,8 +161,11 @@
                     } else {
                         clearInterval(interval); // Stop the interval when upload is complete
                         const statusBar = document.getElementById('file' + file_num + '-status');
+                        const progressStatus = document.getElementById('file'+ file_num + '-percent');
+                        progressStatus.innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;"><img src="/images/checkmark-svgrepo-com.svg"/></p>'
                         statusBar.textContent = file.name + " • Uploaded"
-                        displayProgress(0); // Reset progress bar
+                        uploaded_files.push(file);
+                        // displayProgress(0); // Reset progress bar
                     }
                 }, 200)
             }
@@ -172,7 +183,6 @@
                 }
             }
             function transition(){
-                console.log("WOWOWOWW")
                 const heartElements = document.querySelectorAll('.heart');
                 const bodyElements = document.querySelectorAll('.transition');
                 heartElements.forEach(element => {
@@ -218,6 +228,7 @@
                 intervalId = setInterval(() => {
                 for (let i = 0; i < 1; i++) {
                     spawnHeart();
+                    console.log(uploaded_files)
                 }
                 }, 400); // 1000 ms = 1 second
             }
@@ -233,7 +244,6 @@
                     window.location.href = '/index.html'; // Redirect to login page
                 } else if (res.ok) {
                     // User is authenticated; proceed normally
-                    console.log('User is authenticated.');
                     startSpawning();
                 }
             };
@@ -258,6 +268,7 @@
                         row.appendChild(cell);
                         tableBody.appendChild(row);
                     });
+                    document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">Succesfully parsed<img src="/images/checkmark-svgrepo-com.svg"/></p>'
                 }
                 // console.log( res) 
                 // const data = await res.json()
@@ -265,10 +276,10 @@
             }
             async function sendInfo(e) {
                 e.preventDefault()
-                if (inputFile.value == '') { return }
+                if (uploaded_files.length == 0) { return }
                 const formData = new FormData()
-                for (let i=0; i<files.files.length; i++) {
-                    formData.append("files", files.files[i])
+                for (let i=0; i<uploaded_files.length; i++) {
+                    formData.append("files", uploaded_files[i])
                 }
                 // console.log(...formData)
                 const res = await fetch(baseUrl + '/uploads', {
@@ -292,24 +303,23 @@
                         row.appendChild(cell);
                         tableBody.appendChild(row);
                     });
+                    // document.getElementById("message").textContent = "Succesfully uploaded"
+                    document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">Succesfully uploaded and parsed<img src="/images/checkmark-svgrepo-com.svg"/></p>'
                 }
                 else {
-                    if (res.ok) {
-                        document.getElementById("message").textContent = "Succesfully uploaded"
-                    }
                     if (res.status === 401) {
-                        document.getElementById("message").textContent = "Page timeout, redirecting to login page"
+                        alert("Page timeout, redirecting to login page")
                         logOut()
 
                     }
                     else if (res.status === 403) {
-                        document.getElementById("message").textContent = "Page timeout, redirecting to login page"
+                        alert("Page timeout, redirecting to login page")
                         logOut()
                         
                     }
                     else if (res.status === 500) {
                         // Display file parsing error
-                        document.getElementById("message").textContent = "Error with files, are you sure you uploaded the correct files?"
+                        alert("Error with files, are you sure you uploaded the correct files?")
                     }
                 }
             }
