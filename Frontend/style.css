@@ -8,6 +8,7 @@ body{
 }
 .header{
     margin-top: 25px;
+    height: 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -15,6 +16,7 @@ body{
 .header-text{
     flex: 1;
     text-align: center;
+    font-size: calc(.7em + 1vw);
     /* margin: 0 auto; */
     /* text-align: center; */
     /* align-items: center; */
@@ -23,15 +25,27 @@ body{
     height: 100%;
     width: 100%;
 }
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-attachment: fixed;
+    background-image: url('/images/backround.svg');
+    background-size: cover; /* Ensures the SVG covers the entire background */
+    background-repeat: no-repeat; /* Prevents repeating */
+    background-position: bottom 100%; /* Centers the SVG */
+}
 .form-box{
     overflow:hidden;
-    width: 380px;
+    width: 95vw;
+    max-width: 380px;
     height: 380px;
     position: relative;
     margin: 6% auto;
     background: #fff;
     padding: 5px;
     border-radius: 60px;
+    box-shadow: 0 0 20px 9px #ff61241f;
     
 }
 .button-box{
@@ -60,9 +74,10 @@ body{
     transition: .5s;
 }
 .input-group{
+    width:70vw;
     top:110px;
     position:absolute;
-    width:280px;
+    max-width:280px;
     transition: .5s;
 }
 .input-field{
@@ -82,6 +97,7 @@ body{
     cursor: pointer;
     display: block;
     margin: auto;
+    box-shadow: 0 0 20px 9px #ff61241f;
     background: linear-gradient(to right, #F58529, #DD2A7B, #8134AF);
     border:0;
     outline:none;
@@ -97,6 +113,7 @@ input[type="file"]{
     display: flex; /* Use flexbox */
     justify-content: center; /* Center text horizontally */
     align-items: center;
+    box-shadow: 0 0 20px 9px #ff61241f;
     background: linear-gradient(to right, #F58529, #DD2A7B, #8134AF);
     border-radius:30px;
     width: 70%;
@@ -110,15 +127,21 @@ input[type="file"]{
     border-radius:30px;
     outline:none;
     border:0;
-    padding: 10px 30px;
+    box-shadow: 0 0 20px 9px #ff61241f;
+    /* padding: 0px 30px; */
+    width:80px;
+    height:30px;
+    /* line-height: 0px; */
     cursor: pointer;
-    /* margin: auto; */
-    margin-right: 40px;
+    margin: auto;
+    /* width:1em;
+    height:1em; */
+    margin-right: 10px;
     display: block;
     position:relative;
 }
 .header-white-space{
-    width:138px;
+    width:90px;
     /* margin-right: 40px; */
 }
 .submit-btn:hover{
@@ -135,6 +158,9 @@ input[type="file"]{
 }
 .err-message{
     color:#ff0000;
+}
+.message{
+    color:#000000;
 }
 .heart{
     position: absolute;

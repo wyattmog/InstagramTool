@@ -7,10 +7,10 @@
     <title>Login Page</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body backround-image="images/backround.svg">
+<body>
     <div style = "text-align: center;"> 
         <div class = "header">
-            <h1 class = "header-text"> <img src = "/images/instagram_logo.svg" width="24.004" height="24" title="instagram_logo"> Instagram Unfollower Tool </h1>
+            <h1 class = "header-text"> <img src = "/images/instagram_logo.svg" width="24.004" height="24" title="instagram_logo"style="width:1em;height:1em;"> UnfollowersTracker</h1>
         </div>
         <div class = "form-box">
             <div class = "button-box transition">
@@ -129,15 +129,18 @@
                 });
                 if (res.ok) {
                     // display registered
-                    document.getElementById("register-message").textContent = "Succesful Registered";
+                    document.getElementById("register-message").className = "message"
+                    document.getElementById("register-message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; justify-content:center;">Succesful Registered<img src="/images/checkmark-svgrepo-com.svg"/></p>'
                 }
                 else {
                     if (res.status === 400) {
+                        document.getElementById("register-message").className = "err-message"
                         document.getElementById("register-message").textContent = "Username already taken";
 
                     }
                     else {
                         // Display error during registeration, try again later
+                        document.getElementById("register-message").className = "err-message"
                         document.getElementById("register-message").textContent = "Error during registration, try again later";
                     };
                 };
