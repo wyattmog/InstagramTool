@@ -17,21 +17,9 @@ app.use(express.static('/Users/wyattmogelson/Coding/InstagramTool/Frontend'))
 app.use(express.json())
 app.use(cookieParser())
 
-const storage = multer.diskStorage({
-    destination: function(req, file, callback) {
-        if (file.originalname == 'following.html') {
-            callback(null, __dirname + "/uploads/following")
-        }
-        else if (file.originalname == 'followers_1.html') {
-            callback(null, __dirname + "/uploads/followers")
-        }
-        else {
-            callback(Error)
-        }
-    },
-    filename: function(req, file, callback) {
-        callback(null, file.originalname ) 
-    }
+const storage = multer.memoryStorage({
+    storage: multer.memoryStorage() ,
+    limits: { fileSize: 5 * 1024 * 1024 }
 })
 // Use enviornment variables because it prevents hard coding
 // authentication, and allows user to change the value without
@@ -43,7 +31,6 @@ const pool = mysql.createPool({
     password: process.env.DB1_PASSWORD,
     database: process.env.DB1_DATABASE
 }).promise()
-
 
 const uploads = multer({storage: storage})
 // This communicates from backend to front end
@@ -73,43 +60,45 @@ app.use((err, req, res, next) => {
 // Uses JSDOM to parse and query and get all hyperlink content
 // For both following and follower links, puts
 // both into respective arrays.
-app.post('/uploads', authenticateToken, uploads.array("files"), async (req, res) => {
+app.post('/uploads', authenticateToken, uploads.array('files'), async (req, res) => {
     await deleteColumns(req.user)
+    if (!req.files || req.files.length === 0) {
+        return res.status(500).send('No files uploaded or invalid file type.');
+    }
     try {
-        if (!req.files || req.files.length === 0) {
-            return res.status(400).send('No files uploaded or invalid file type.');
+        const followersFile = req.files.find(file => (file.originalname === 'followers_1.html') || (file.originalname === 'followers.html'));
+        const followingFile = req.files.find(file => file.originalname === 'following.html');
+        if (!followersFile || !followingFile) {
+            return res.status(500).send('Required files are missing.');
         }
-        await new Promise((resolve, reject) => {
-            fs.readFile("/Users/wyattmogelson/Coding/InstagramTool/Backend/uploads/followers/followers_1.html", "utf-8", async (err, data) => {
-                if (err) {
-                //   console.error("Error reading the file:", err);
-                    reject()
-                    return res.status(500).send('File parsing error');
-                }
+        await new Promise( async (resolve, reject) => {
+            try {
+                const data = followersFile.buffer.toString("utf-8")
                 const dom = new JSDOM(data);
                 const links = dom.window.document.querySelectorAll("a");
                 for (let i = 0; i < links.length; i++) {
                     await insertFollowers(links[i].textContent, req.user)
                 }
                 resolve()
-            })
+            }
+            catch (err) {
+                reject(err)
+            }
         })
-        await new Promise((resolve, reject) => {
-            fs.readFile("/Users/wyattmogelson/Coding/InstagramTool/Backend/uploads/following/following.html", "utf-8", async (err, data) => {
-                if (err) {
-                    // console.error("Error reading the file:", err);
-                    reject()
-                    return res.status(500).send('File parsing error');
-                }
+        await new Promise( async (resolve, reject) => {
+            try {
+                const data = followingFile.buffer.toString("utf-8")
                 const dom = new JSDOM(data);
                 const links = dom.window.document.querySelectorAll("a");
                 for (let i = 0; i < links.length; i++) {
                     await insertFollowing(links[i].textContent, req.user)
-                    // insertFollowing(links[i].textContent)
                 }
                 resolve()
-            })
-        })  
+            }
+            catch (err) {
+                reject(err)
+            }
+        })
         const result = await parse(req.user)
         // const result = await parse()
         res.json(result) 

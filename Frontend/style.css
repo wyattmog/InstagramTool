@@ -151,10 +151,10 @@ input[type="file"]{
     margin: 10px 10px 30px 0;
 }
 #login-screen{
-    left:50px;
+    left:58px;
 }
 #register-screen{
-    left:450px;
+    left:458px;
 }
 .err-message{
     color:#ff0000;

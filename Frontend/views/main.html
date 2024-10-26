@@ -68,46 +68,6 @@
                 </div>
             </form>
         </form>
-                <!-- <table id = "userTable">
-                    <thead>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table> -->
-                <!-- <h1 id = "output"></h1> -->
-                <!-- <input class = "input-field", type ="text" id = "login-username" placeholder="Enter Username" required>
-                <br><br>
-                <input class = "input-field" type ="text" id = "login-password" placeholder="Enter Password" required>
-                <p class = "err-message" id = "login-message"><br></p>
-                <input type="checkbox" class="check-box"><span>Keep me logged in</span>
-                <button class = "submit-btn" id = "login">Login</button> -->
-                <!-- <p>Haven't made an account?</p><a href="views/register.html">Register</a> -->
-            <!-- </form> -->
-        <!-- </div>
-        <hr>
-        <div>
-            <p1>Check who unfollowed you with one simple file upload:</p1>
-        </div>
-        <br><br>
-        <form>
-            <div>
-                <label for="fname">Upload File:</label>
-                <input type="file" id="files" name="file" accept = ".html" multiple>
-                <p id = "message"><br></p>
-                <button id = "submit">Submit</button>
-                <br><br>
-                <table id = "userTable">
-                    <thead>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-                <h1 id = "output"></h1>
-            </div>
-            <br>
-            <br>
-        </form>
-        <br> -->
         <script> 
             const submitBtn = document.getElementById("submit") 
             const logoutBtn = document.getElementById("logout-btn") 
@@ -132,6 +92,12 @@
                 }
                 else if (inputFile.files.length == 0) {
                     return
+                }
+                else if (inputFile.files.length == 1) {
+                    uploaded_files.pop()
+                }
+                else if (inputFile.files.length == 2) {
+                    uploaded_files = []
                 }
                 for (let i = 0; i < inputFile.files.length; i++) {
                     calcProgress(inputFile.files[i], i+1)
@@ -270,18 +236,23 @@
                     });
                     document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">Succesfully parsed<img src="/images/checkmark-svgrepo-com.svg"/></p>'
                 }
+                else if (res.status === 400) {
+                    alert("No records found, try uploaded your files first")
+                }
                 // console.log( res) 
                 // const data = await res.json()
                 // output.textContent = data.info
             }
             async function sendInfo(e) {
                 e.preventDefault()
-                if (uploaded_files.length == 0) { return }
+                if (uploaded_files.length == 0) { 
+                    alert("No Files Found")
+                    return 
+                }
                 const formData = new FormData()
                 for (let i=0; i<uploaded_files.length; i++) {
                     formData.append("files", uploaded_files[i])
                 }
-                // console.log(...formData)
                 const res = await fetch(baseUrl + '/uploads', {
                     method: 'POST',
                     body: formData
@@ -296,9 +267,6 @@
                         const img = document.createElement('td');
                         img.innerHTML = `<img src="/images/user.svg" width="36" height="36" alt="User Icon">`;
                         cell.textContent = user.following_id
-
-                        // Append the image to the cell
-                        // cell.textContent = user.following_id;
                         row.appendChild(img);
                         row.appendChild(cell);
                         tableBody.appendChild(row);
