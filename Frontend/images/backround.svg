@@ -6,7 +6,13 @@
       <stop offset="33%" style="stop-color:#ffffff" />
       <stop offset="100%" style="stop-color:rgb(255, 0, 0)" />
     </linearGradient>
+    <!-- More visible vignette effect -->
+    <radialGradient id="vignetteGradient" cx="50%" cy="50%" r="100%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:rgba(0, 0, 0, 0)" />
+      <stop offset="70%" style="stop-color:rgba(0, 0, 0, 0.05)" /> <!-- Increased opacity -->
+    </radialGradient>
   </defs>
+  
   <rect width="100%" height="100%" fill="url(#bgGradient)"/>
 
   <!-- Fully red wave at the bottom -->
@@ -23,4 +29,7 @@
 
   <!-- Lightest red transparent wave -->
   <path d="M 0 110 Q 100 80, 200 110 T 400 110 V 200 H 0 Z" fill="rgba(255, 0, 0, 0.2)"/>
+
+  <!-- Vignette overlay (only around the edges) -->
+  <rect width="100%" height="100%" fill="url(#vignetteGradient)" />
 </svg>

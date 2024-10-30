@@ -11,7 +11,7 @@
     <div style = "text-align: center;"> 
         <div class = "header">
             <div class="header-white-space"></div>
-            <h1 class = "header-text"> <img src = "/images/instagram_logo.svg" width="24.004" height="24" title="instagram_logo"style="width:1em;height:1em;"> UnfollowersTracker</h1>
+            <h1 class = "header-text"> <img src = "/images/people.svg" title="instagram_logo"style="width:1em;height:1em;"> UnfollowersTracker</h1>
             <button class="logout-btn transition" id = "logout-btn">Logout</button>
         </div>
         <div class = "form-box">
@@ -87,7 +87,8 @@
             }
             function uploadFiles() {
                 if (inputFile.files.length > 2) {
-                    alert("You uploaded too many files. Only upload two files.")
+                    // alert("You uploaded too many files. Only upload two files.")
+                    document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">Only Upload 2 Files</p>'
                     return
                 }
                 else if (inputFile.files.length == 0) {
@@ -99,6 +100,8 @@
                 else if (inputFile.files.length == 2) {
                     uploaded_files = []
                 }
+                document.getElementById("progress-bar1").style.outline = 'none'
+                document.getElementById("progress-bar2").style.outline = 'none'
                 for (let i = 0; i < inputFile.files.length; i++) {
                     calcProgress(inputFile.files[i], i+1)
                 }
@@ -177,7 +180,7 @@
                 // newHeart.style.left = x + 'px';
                 // newHeart.style.top = y + 'px';
                 newHeart.style.left = Math.random() * window.innerWidth + 'px';
-                newHeart.style.top = Math.random() * window.innerHeight + 'px';
+                newHeart.style.top = .9 * window.innerHeight + 'px';
                 document.getElementById("heart-loc").appendChild(newHeart);
 
                 setTimeout(() => {
@@ -234,10 +237,13 @@
                         row.appendChild(cell);
                         tableBody.appendChild(row);
                     });
+                    document.getElementById("message").className = "message"
                     document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">Succesfully parsed<img src="/images/checkmark-svgrepo-com.svg"/></p>'
                 }
                 else if (res.status === 400) {
-                    alert("No records found, try uploaded your files first")
+                    // alert("No records found, try uploaded your files first")
+                    document.getElementById("message").className = "err-message"
+                    document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">Try Uploading A File!</p>'
                 }
                 // console.log( res) 
                 // const data = await res.json()
@@ -246,7 +252,8 @@
             async function sendInfo(e) {
                 e.preventDefault()
                 if (uploaded_files.length == 0) { 
-                    alert("No Files Found")
+                    document.getElementById("message").className = "err-message"
+                    document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">No Files Found</p>'
                     return 
                 }
                 const formData = new FormData()
@@ -272,6 +279,7 @@
                         tableBody.appendChild(row);
                     });
                     // document.getElementById("message").textContent = "Succesfully uploaded"
+                    document.getElementById("message").className = "message"
                     document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">Succesfully uploaded and parsed<img src="/images/checkmark-svgrepo-com.svg"/></p>'
                 }
                 else {
@@ -287,7 +295,11 @@
                     }
                     else if (res.status === 500) {
                         // Display file parsing error
-                        alert("Error with files, are you sure you uploaded the correct files?")
+                        document.getElementById("message").className = "err-message"
+                        document.getElementById("progress-bar1").style.outline = 'rgb(255, 0, 0) solid 1px'
+                        document.getElementById("progress-bar2").style.outline = 'rgb(255, 0, 0) solid 1px'
+                        document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">Error with files</p>'
+                        // alert("Error with files, are you sure you uploaded the correct files?")
                     }
                 }
             }
