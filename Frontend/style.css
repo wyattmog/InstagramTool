@@ -53,13 +53,14 @@ body {
     margin:35px auto;
     position: relative;
     box-shadow: 0 0 20px 9px #ff61241f;
-    border-radius: 30px;
+    border-radius: 10px;
 }
 .toggle-btn{
     padding: 10px 30px;
     cursor: pointer;
     background: transparent;
     border: 0;
+    border-radius: 10px;
     outline: none;
     position: relative;
 }
@@ -69,8 +70,8 @@ body {
     position:absolute;
     width: 110px;
     height: 100%;
-    background: linear-gradient(to right, #F58529, #DD2A7B, #8134AF);
-    border-radius: 30px;
+    background: rgb(255, 0, 0, 0.7);
+    border-radius: 10px;
     transition: .5s;
 }
 .input-group{
@@ -98,13 +99,13 @@ body {
     display: block;
     margin: auto;
     box-shadow: 0 0 20px 9px #ff61241f;
-    background: linear-gradient(to right, #F58529, #DD2A7B, #8134AF);
+    background: rgb(255, 0, 0, 0.7);
     border:0;
     outline:none;
-    border-radius:30px;
+    border-radius:10px;
 }
 .file-field{
-    background: linear-gradient(to right, #F58529, #DD2A7B, #8134AF);
+    background: rgb(255, 0, 0, 0.7);
 }
 input[type="file"]{
     display: none;
@@ -114,8 +115,8 @@ input[type="file"]{
     justify-content: center; /* Center text horizontally */
     align-items: center;
     box-shadow: 0 0 20px 9px #ff61241f;
-    background: linear-gradient(to right, #F58529, #DD2A7B, #8134AF);
-    border-radius:30px;
+    background: rgb(255, 0, 0, 0.7);
+    border-radius:10px;
     width: 70%;
     padding: 0px 60px;
     cursor: pointer;
@@ -123,8 +124,8 @@ input[type="file"]{
     
 }
 .logout-btn{
-    background: linear-gradient(to right, #F58529, #DD2A7B, #8134AF);
-    border-radius:30px;
+    background: rgb(255, 0, 0, 0.7);
+    border-radius:10px;
     outline:none;
     border:0;
     box-shadow: 0 0 20px 9px #ff61241f;
@@ -145,7 +146,16 @@ input[type="file"]{
     /* margin-right: 40px; */
 }
 .submit-btn:hover{
-    background: linear-gradient(to right, #f79443, #d94d8c, #8e53b0);
+    background: rgb(255, 0, 0, 0.5);
+    scale: 0.97;
+}
+.logout-btn:hover{
+    background: rgb(255, 0, 0, 0.5);
+    scale: 0.97;
+}
+#upload-label:hover{
+    background: rgb(255, 0, 0, 0.5);
+    scale: 0.97;
 }
 .check-box{
     margin: 10px 10px 30px 0;
@@ -157,7 +167,9 @@ input[type="file"]{
     left:458px;
 }
 .err-message{
-    color:#ff0000;
+    color:rgb(255, 0, 0);
+    height:25px;
+    align-content: center;
 }
 .message{
     color:#000000;
@@ -227,13 +239,21 @@ progress {
     box-shadow: 1px 1px 4px rgba( 0, 0, 0, 0.2 );
 }
 progress::-webkit-progress-value {
-background-color: #8134AF;
+background-color: rgb(155, 0, 0);
 }
 .scroll-div{
     overflow-y: auto;
     max-height: 240px; 
     /* background-color: rgb(128, 128, 128, 0.05); */
 }
+.scroll-div::-webkit-scrollbar{
+    width: 10px;
+    background-color: #F5F5F5;
+  }
+  .scroll-div::-webkit-scrollbar-thumb{
+    background-color: rgb(255, 0, 0, 0.7);
+    /* border: 2px solid #555555; */
+  }
 .progress-text{
     gap:10px;
     display:flex;

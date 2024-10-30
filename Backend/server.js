@@ -61,7 +61,6 @@ app.use((err, req, res, next) => {
 // For both following and follower links, puts
 // both into respective arrays.
 app.post('/uploads', authenticateToken, uploads.array('files'), async (req, res) => {
-    await deleteColumns(req.user)
     if (!req.files || req.files.length === 0) {
         return res.status(500).send('No files uploaded or invalid file type.');
     }
@@ -71,6 +70,7 @@ app.post('/uploads', authenticateToken, uploads.array('files'), async (req, res)
         if (!followersFile || !followingFile) {
             return res.status(500).send('Required files are missing.');
         }
+        await deleteColumns(req.user)
         await new Promise( async (resolve, reject) => {
             try {
                 const data = followersFile.buffer.toString("utf-8")
@@ -130,10 +130,6 @@ app.post('/register', uploads.none(), async (req, res) => {
             return res.status(400).send('Username already taken')
         }
         const hashedPassword = await bcrypt.hash(password, 10)
-        // bcrypt.hash(password, 10, (err, hash) => {
-        //     if (err) {
-        //         return res.status(500).send('Error hashing password');
-        //     }
         await pool.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword])
         res.json('User registered successfully')
     }
