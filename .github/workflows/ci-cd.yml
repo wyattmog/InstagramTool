@@ -34,6 +34,7 @@ jobs:
           username: ${{ secrets.Oracle_USER }}      # Your Oracle username
           key: ${{ secrets.Oracle_SSH_KEY }}            # Your SSH private key
           script: |
+            export NODE_ENV=production
             cd /home/opc/InstagramTool/Backend  # Adjust the path to your backend
             git pull origin main       # Pull the latest changes
             npm install    # Install only production dependencies

@@ -14,11 +14,18 @@ const result = dotenv.config({
 if (result.error) {
     throw result.error;
 }
-const allowedOrigins = [
-    'http://localhost:5500', // Your local server
-    'https://wyattmog.github.io', // GitHub Pages domain
-    'https://wyattmog.github.io/InstagramTool' // Specific repository if applicable
-];
+const isProduction = process.env.NODE_ENV === 'production';
+
+const allowedOrigins = isProduction ? 
+    ['https://your-production-domain.com'] : 
+    ['http://localhost:5500'];
+
+const cookieOptions = {
+    httpOnly: true,
+    sameSite: 'Strict',
+    maxAge: 3600000, // Example maxAge
+    secure: isProduction, // Set secure cookies only in production
+};
 
 const mysql = require('mysql2')
 const app = express()
@@ -226,11 +233,7 @@ app.post('/login', uploads.none(), async (req, res) => {
         const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET)
         // Sets expiration to 1 week and one hour respectively
         const maxAges = String(remember) == "true" ? 604800000 : 3600000;
-        res.cookie('auth_token', accessToken, {
-            httpOnly: true,     // Prevents JavaScript from accessing the cookie (helps prevent XSS)   
-            sameSite: 'Strict', // Prevents the cookie from being sent with cross-site requests (helps prevent CSRF)
-            maxAge: maxAges     // Sets cookie expiration time 
-        })
+        res.cookie('auth_token', accessToken, cookieOptions)
         res.json( {message: "login success"})
     } catch (err) {
         return res.status(500).send('Database error');
