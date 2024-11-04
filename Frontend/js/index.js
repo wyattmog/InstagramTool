@@ -7,8 +7,7 @@ const registerPassword = document.getElementById("register-password");
 const registerUsername = document.getElementById("register-username");
 const loginPassword = document.getElementById("login-password");
 const loginUsername = document.getElementById("login-username");
-
-const isDevelopment = window.location.hostname === "localhost";
+const isDevelopment = window.location.hostname === "localhost"
 const baseUrl = isDevelopment ? "http://localhost:8383" : "http://207.211.188.250:8383";
 
 // Call the function to get the base URL
@@ -24,7 +23,10 @@ function resetCheck () {
     document.getElementById("terms").classList.remove("terms-err")
 }
 window.onload = async function() {
-    const res = await fetch('/protected', { credentials: 'include' })
+    const res = await fetch(baseUrl + '/protected', { 
+        method: 'GET',
+        credentials: 'include' 
+    })
     if (res.ok) {
         // User is authenticated, redirect to main page
         window.location.href = 'views/main.html'; 
@@ -94,14 +96,15 @@ async function register(e) {
     formData.append("username", registerUsername.value);
     const res = await fetch(baseUrl + '/register', {
         method: 'POST',
-        body: formData
+        body: formData,
+        credentials: 'include'
     
     });
     document.getElementById("register").innerHTML = "Register"
     if (res.ok) {
         // Display registered message
         document.getElementById("register-message").className = "message"
-        document.getElementById("register-message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; justify-content:center;">Succesful Registered<img src="/images/checkmark-svgrepo-com.svg"/></p>'
+        document.getElementById("register-message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; justify-content:center;">Succesful Registered<img src="images/checkmark-svgrepo-com.svg"/></p>'
     }
     else {
         if (res.status === 400) {
@@ -135,6 +138,7 @@ async function login(e) {
     const res = await fetch(baseUrl + '/login', {
         method: 'POST',
         body: formData,
+        credentials: 'include'
         
     });
     if (res.ok) {
