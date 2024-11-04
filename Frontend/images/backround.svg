@@ -1,35 +1,102 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
-  <!-- Background gradient: white at top, rgb(255, 0, 0) red at bottom -->
-  <defs>
-    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#ffffff" />
-      <stop offset="33%" style="stop-color:#ffffff" />
-      <stop offset="100%" style="stop-color:rgb(255, 0, 0)" />
-    </linearGradient>
-    <!-- More visible vignette effect -->
-    <radialGradient id="vignetteGradient" cx="50%" cy="50%" r="100%" fx="50%" fy="50%">
-      <stop offset="0%" style="stop-color:rgba(0, 0, 0, 0)" />
-      <stop offset="70%" style="stop-color:rgba(0, 0, 0, 0.05)" /> <!-- Increased opacity -->
-    </radialGradient>
-  </defs>
-  
-  <rect width="100%" height="100%" fill="url(#bgGradient)"/>
+<svg width="100%" height="100%" viewBox="0 0 1440 600" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .wave1 {
+      animation: wavePeakMove1 7s linear infinite;
+      fill: #ff0000;
+      fill-opacity: 0.3;
+    }
 
-  <!-- Fully red wave at the bottom -->
-  <path d="M 0 150 Q 100 120, 200 150 T 400 150 V 200 H 0 Z" fill="rgba(255, 0, 0, 1)"/>
+    .wave2 {
+      animation: wavePeakMove2 7s linear infinite;
+      fill: #ff0000;
+      fill-opacity: 0.6; /* Same as wave1 */
+    }
 
-  <!-- Dark red transparent wave -->
-  <path d="M 0 140 Q 100 110, 200 140 T 400 140 V 200 H 0 Z" fill="rgba(255, 0, 0, 0.8)"/>
+    .wave3 {
+      animation: wavePeakMove3 7s linear infinite;
+      fill: #ff0000;
+      fill-opacity: 0.3;
+    }
 
-  <!-- Lighter red transparent wave -->
-  <path d="M 0 130 Q 100 100, 200 130 T 400 130 V 200 H 0 Z" fill="rgba(255, 0, 0, 0.6)"/>
+    .wave4 {
+      animation: wavePeakMove4 7s linear infinite;
+      fill: #ff0000;
+      fill-opacity: 0.6;
+    }
 
-  <!-- Even lighter red transparent wave -->
-  <path d="M 0 120 Q 100 90, 200 120 T 400 120 V 200 H 0 Z" fill="rgba(255, 0, 0, 0.4)"/>
+    /* First Wave Peak Movement - leftward */
+    @keyframes wavePeakMove1 {
+      0% {
+        d: path("M 0,600 L 0,410 C 150,400 300,460 450,440 C 600,420 750,460 900,440 C 1050,420 1200,400 1440,420 L 1440,600 L 0,600 Z");
+      }
+      50% {
+        d: path("M 0,600 L 0,420 C 100,400 250,460 400,440 C 550,420 700,460 850,440 C 1000,420 1150,400 1400,420 L 1440,600 L 0,600 Z");
+      }
+      100% {
+        d: path("M 0,600 L 0,410 C 150,400 300,460 450,440 C 600,420 750,460 900,440 C 1050,420 1200,400 1440,420 L 1440,600 L 0,600 Z");
+      }
+    }
 
-  <!-- Lightest red transparent wave -->
-  <path d="M 0 110 Q 100 80, 200 110 T 400 110 V 200 H 0 Z" fill="rgba(255, 0, 0, 0.2)"/>
+    /* Second Wave Peak Movement - rightward */
+    @keyframes wavePeakMove2 {
+      0% {
+        d: path("M 0,600 L 0,440 C 150,400 300,480 450,460 C 600,440 750,480 900,460 C 1050,440 1200,420 1440,440 L 1440,600 L 0,600 Z");
+      }
+      50% {
+        d: path("M 0,600 L 0,430 C 200,400 350,480 500,460 C 650,440 800,480 950,460 C 1100,440 1250,420 1440,440 L 1440,600 L 0,600 Z");
+      }
+      100% {
+        d: path("M 0,600 L 0,440 C 150,400 300,480 450,460 C 600,440 750,480 900,460 C 1050,440 1200,420 1440,440 L 1440,600 L 0,600 Z");
+      }
+    }
 
-  <!-- Vignette overlay (only around the edges) -->
-  <rect width="100%" height="100%" fill="url(#vignetteGradient)" />
+    /* Third Wave Peak Movement - flipped version of wave1 */
+    @keyframes wavePeakMove3 {
+      0% {
+        d: path("M 0,0 L 0,60 C 150,80 300,40 450,60 C 600,80 750,40 900,60 C 1050,80 1200,80 1440,60 L 1440,0 L 0,0 Z");
+      }
+      50% {
+        d: path("M 0,0 L 0,60 C 100,80 250,40 400,60 C 550,80 700,40 850,60 C 1000,80 1150,80 1400,60 L 1440,0 L 0,0 Z");
+      }
+      100% {
+        d: path("M 0,0 L 0,60 C 150,80 300,40 450,60 C 600,80 750,40 900,60 C 1050,80 1200,80 1440,60 L 1440,0 L 0,0 Z");
+      }
+    }
+
+    /* Fourth Wave Peak Movement - flipped version of wave2 */
+    @keyframes wavePeakMove4 {
+      0% {
+        d: path("M 0,0 L 0,50 C 150,70 300,30 450,50 C 600,70 750,30 900,50 C 1050,70 1200,90 1440,50 L 1440,0 L 0,0 Z");
+      }
+      50% {
+        d: path("M 0,0 L 0,50 C 200,70 350,30 500,50 C 650,70 800,30 950,50 C 1100,70 1250,90 1440,50 L 1440,0 L 0,0 Z");
+      }
+      100% {
+        d: path("M 0,0 L 0,50 C 150,70 300,30 450,50 C 600,70 750,30 900,50 C 1050,70 1200,90 1440,50 L 1440,0 L 0,0 Z");
+      }
+    }
+  </style>
+
+  <!-- First Wave (Lower on screen) -->
+  <path d="M 0,600 L 0,380 C 150,400 300,460 450,440 C 600,420 750,460 900,440 C 1050,420 1200,400 1440,420 L 1440,600 L 0,600 Z" class="wave1"></path>
+
+  <!-- Second Wave (Lower on screen) -->
+  <path d="M 0,600 L 0,420 C 150,400 300,480 450,460 C 600,440 750,480 900,460 C 1050,440 1200,420 1440,440 L 1440,600 L 0,600 Z" class="wave2"></path>
+
+  <!-- Third Wave (Higher on screen, flipped version of wave1) -->
+  <path d="M 0,0 L 0,60 C 150,80 300,40 450,60 C 600,80 750,40 900,60 C 1050,80 1200,80 1440,60 L 1440,0 L 0,0 Z" class="wave3"></path>
+
+  <!-- Fourth Wave (Higher on screen, flipped version of wave2) -->
+  <path d="M 0,0 L 0,50 C 150,70 300,30 450,50 C 600,70 750,30 900,50 C 1050,70 1200,90 1440,50 L 1440,0 L 0,0 Z" class="wave4"></path>
 </svg>
+
+
+
+
+
+
+
+
+
+
+

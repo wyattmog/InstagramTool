@@ -1,5 +1,4 @@
 .env
-config.json
 .env.development
 Backend/uploads/
 Backend/node_modules/

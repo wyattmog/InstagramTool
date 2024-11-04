@@ -3,14 +3,16 @@ USE instagram_tool;
 
 CREATE TABLE followers (
     user_id VARCHAR(255) NOT NULL,
+    follower_link VARCHAR(255) NOT NULL,
     follower_id VARCHAR(255) NOT NULL,
-    PRIMARY KEY (user_id, follower_id)
+    PRIMARY KEY (user_id, follower_id, follower_link)
 );
 
 CREATE TABLE following (
     user_id VARCHAR(255) NOT NULL,
+    following_link VARCHAR(255) NOT NULL,
     following_id VARCHAR(255) NOT NULL,
-    PRIMARY KEY (user_id, following_id)
+    PRIMARY KEY (user_id, following_id, following_link)
 );
 
 CREATE TABLE users (

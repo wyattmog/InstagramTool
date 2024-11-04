@@ -15,11 +15,6 @@
             <button class="logout-btn transition" id = "logout-btn">Logout</button>
         </div>
         <div class = "form-box">
-            <!-- <div class = "button-box">
-                <div id="switch-btn"></div>
-                <button class = "toggle-btn" id = "to-login" onclick="toLogin()">Login</button>
-                <button class =  "toggle-btn" id = "to-register" onclick="toRegister()">Register</button>
-            </div> -->
             <div class = "button-box transition">
                 <div id="switch-btn"></div>
                 <button class = "toggle-btn" id = "to-login" onclick="toUpload()">Upload</button>
@@ -28,8 +23,8 @@
         </form>
             <form id = "login-screen" class="input-group upload-btns transition">
                 <div style="display:flex; flex-direction: row; gap:5px;">
-                    <label style = "height:36px;" id = "upload-label" for = "files">Upload</label>
-                    <input class="file-field" onchange = "uploadFiles()" type="file" id="files" name="file" accept = ".html" multiple>
+                    <label style = "height:36px;" id = "upload-label" for = "zipfile">Upload</label>
+                    <input class="file-field" onchange = "uploadFiles()" type="file" id="zipfile" name="file" accept = ".zip">
                     <button class = "submit-btn" style = "height:36px;" id = "getInfo">Get</button>
                 </div>
                 <div class = "progress-bars">
@@ -54,8 +49,9 @@
                         </div>
                     </div>
                 </div>
-                <button class = "submit-btn"id = "submit">Submit</button>
-                <p id = "message"></p>
+                <button class = "submit-btn"id = "submit">Submit
+                </button>
+                <p class="err-message" id = "message"></p>                
             </form>
             <form id = "register-screen" class="input-group transition">
                 <div class="scroll-div">
@@ -68,242 +64,7 @@
                 </div>
             </form>
         </form>
-        <script> 
-            const submitBtn = document.getElementById("submit") 
-            const logoutBtn = document.getElementById("logout-btn") 
-            const inputFile = document.getElementById("files")
-            const getBtn = document.getElementById("getInfo")
-            const output = document.getElementById("output")
-            var switchBtn = document.getElementById("switch-btn");
-            var login_screen = document.getElementById("login-screen");
-            var register_screen = document.getElementById("register-screen");
-            let uploaded_files = [];
-            const baseUrl = 'http://localhost:8383'
-            getBtn.addEventListener('click', recieveInfo)
-            submitBtn.addEventListener('click', sendInfo)
-            logoutBtn.addEventListener('click', logOut)
-            function getInfo() {
-
-            }
-            function uploadFiles() {
-                if (inputFile.files.length > 2) {
-                    // alert("You uploaded too many files. Only upload two files.")
-                    document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">Only Upload 2 Files</p>'
-                    return
-                }
-                else if (inputFile.files.length == 0) {
-                    return
-                }
-                else if (inputFile.files.length == 1) {
-                    uploaded_files.pop()
-                }
-                else if (inputFile.files.length == 2) {
-                    uploaded_files = []
-                }
-                document.getElementById("progress-bar1").style.outline = 'none'
-                document.getElementById("progress-bar2").style.outline = 'none'
-                for (let i = 0; i < inputFile.files.length; i++) {
-                    calcProgress(inputFile.files[i], i+1)
-                }
-            }
-            function displayProgress(percentComplete, file_num){
-                const fileBox = document.getElementById('progress-bar' + file_num)
-                const progressStatus = document.getElementById('file'+ file_num + '-percent');
-                const progressBar = document.getElementById('file'+file_num+"-bar")
-                fileBox.style.visibility = "visible"
-                progressBar.value = percentComplete
-                progressStatus.textContent = Math.round(percentComplete) + '%'; // Update text
-            }
-            function calcProgress(file, file_num) {
-                const statusBar = document.getElementById('file' + file_num + '-status');
-                statusBar.textContent = "Uploading..."
-                const totalSize = file.size;
-                let uploadedSize = 0;
-                const interval = setInterval(() => {
-                    if (uploadedSize < totalSize) {
-                        uploadedSize += 100000;
-                        if (uploadedSize > totalSize) {
-                            uploadedSize = totalSize; // Prevent exceeding total size
-                        }
-                        const percentComplete = (uploadedSize / totalSize) * 100; // Calculate progress
-                        displayProgress(percentComplete, file_num); // Update the progress bar
-                    } else {
-                        clearInterval(interval); // Stop the interval when upload is complete
-                        const statusBar = document.getElementById('file' + file_num + '-status');
-                        const progressStatus = document.getElementById('file'+ file_num + '-percent');
-                        progressStatus.innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;"><img src="/images/checkmark-svgrepo-com.svg"/></p>'
-                        statusBar.textContent = file.name + " • Uploaded"
-                        uploaded_files.push(file);
-                        // displayProgress(0); // Reset progress bar
-                    }
-                }, 200)
-            }
-            async function logOut(e) {
-                const res = await fetch(baseUrl + '/logout', {
-                    method: 'POST',
-                
-                })
-                if (res.ok) {
-                    transition();
-                    clearInterval(intervalId);
-                    setTimeout(() => {
-                        window.location.href = '/index.html';
-                    }, 200); // 1000 ms = 1 second
-                }
-            }
-            function transition(){
-                const heartElements = document.querySelectorAll('.heart');
-                const bodyElements = document.querySelectorAll('.transition');
-                heartElements.forEach(element => {
-                    element.style.opacity = 0;
-                });
-                bodyElements.forEach(element => {
-                    element.classList.add('fade');
-                })
-            }
-            function toOutput(){
-                login_screen.style.left = "-400px";
-                register_screen.style.left = "50px";
-                switchBtn.style.left = "110px";
-            };
-            function toUpload(){
-                login_screen.style.left = "50px";
-                register_screen.style.left = "450px";
-                switchBtn.style.left = "0px";
-            };
-            function spawnHeart(event){
-                const newHeart = document.createElement('div');
-                newHeart.classList.add('heart')
-                // const x = event.clientX; // X coordinate of the click
-                // const y = event.clientY;
-                // console.log(x,y)
-                // newHeart.style.left = x + 'px';
-                // newHeart.style.top = y + 'px';
-                newHeart.style.left = Math.random() * window.innerWidth + 'px';
-                newHeart.style.top = .9 * window.innerHeight + 'px';
-                document.getElementById("heart-loc").appendChild(newHeart);
-
-                setTimeout(() => {
-                newHeart.classList.add('hidden');
-                // Optional: remove from DOM after it is invisible
-                setTimeout(() => newHeart.remove(), 500); 
-                }, 3500);
-            }
-
-            // document.addEventListener('click', spawnHeart);
-            function startSpawning() {
-
-                // Spawn 3 divs every second
-                intervalId = setInterval(() => {
-                for (let i = 0; i < 1; i++) {
-                    spawnHeart();
-                    console.log(uploaded_files)
-                }
-                }, 400); // 1000 ms = 1 second
-            }
-            window.onload = async function() {
-                const res = await fetch('/protected', { credentials: 'include' })
-                if (res.status === 401) {
-                    // User is not authenticated
-                    // alert('You are not authorized to access this page.');
-                    window.location.href = '/index.html'; // Redirect to login page
-                } else if (res.status === 403) {
-                    // Token is invalid (could be expired)
-                    // alert('Access forbidden. Please log in again.');
-                    window.location.href = '/index.html'; // Redirect to login page
-                } else if (res.ok) {
-                    // User is authenticated; proceed normally
-                    startSpawning();
-                }
-            };
-            async function recieveInfo(e) { 
-                e.preventDefault()
-                const res = await fetch(baseUrl + '/data', {
-                    method: 'GET' 
-                })
-                if (res.ok) {
-                    const data = await res.json()
-                    const tableBody = document.querySelector('#userTable tbody');
-                    data[0].forEach(user => {
-                        const row = document.createElement('tr');
-                        const cell = document.createElement('td');
-                        const img = document.createElement('td');
-                        img.innerHTML = `<img src="/images/user.svg" width="36" height="36" alt="User Icon">`;
-                        cell.textContent = user.following_id
-
-                        // Append the image to the cell
-                        // cell.textContent = user.following_id;
-                        row.appendChild(img);
-                        row.appendChild(cell);
-                        tableBody.appendChild(row);
-                    });
-                    document.getElementById("message").className = "message"
-                    document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">Succesfully parsed<img src="/images/checkmark-svgrepo-com.svg"/></p>'
-                }
-                else if (res.status === 400) {
-                    // alert("No records found, try uploaded your files first")
-                    document.getElementById("message").className = "err-message"
-                    document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">Try Uploading A File!</p>'
-                }
-                // console.log( res) 
-                // const data = await res.json()
-                // output.textContent = data.info
-            }
-            async function sendInfo(e) {
-                e.preventDefault()
-                if (uploaded_files.length == 0) { 
-                    document.getElementById("message").className = "err-message"
-                    document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">No Files Found</p>'
-                    return 
-                }
-                const formData = new FormData()
-                for (let i=0; i<uploaded_files.length; i++) {
-                    formData.append("files", uploaded_files[i])
-                }
-                const res = await fetch(baseUrl + '/uploads', {
-                    method: 'POST',
-                    body: formData
-                
-                })
-                if (res.ok) {
-                    const data = await res.json()
-                    const tableBody = document.querySelector('#userTable tbody');
-                    data[0].forEach(user => {
-                        const row = document.createElement('tr');
-                        const cell = document.createElement('td');
-                        const img = document.createElement('td');
-                        img.innerHTML = `<img src="/images/user.svg" width="36" height="36" alt="User Icon">`;
-                        cell.textContent = user.following_id
-                        row.appendChild(img);
-                        row.appendChild(cell);
-                        tableBody.appendChild(row);
-                    });
-                    // document.getElementById("message").textContent = "Succesfully uploaded"
-                    document.getElementById("message").className = "message"
-                    document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">Succesfully uploaded and parsed<img src="/images/checkmark-svgrepo-com.svg"/></p>'
-                }
-                else {
-                    if (res.status === 401) {
-                        alert("Page timeout, redirecting to login page")
-                        logOut()
-
-                    }
-                    else if (res.status === 403) {
-                        alert("Page timeout, redirecting to login page")
-                        logOut()
-                        
-                    }
-                    else if (res.status === 500) {
-                        // Display file parsing error
-                        document.getElementById("message").className = "err-message"
-                        document.getElementById("progress-bar1").style.outline = 'rgb(255, 0, 0) solid 1px'
-                        document.getElementById("progress-bar2").style.outline = 'rgb(255, 0, 0) solid 1px'
-                        document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">Error with files</p>'
-                        // alert("Error with files, are you sure you uploaded the correct files?")
-                    }
-                }
-            }
-        </script>
+        <script src="/js/main.js"></script>
     </div>
     <div class = "heart-transition" id = "heart-loc"></div>
 
