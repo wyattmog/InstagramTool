@@ -30,9 +30,9 @@ jobs:
       - name: SSH to Oracle Instance and Deploy Backend
         uses: appleboy/ssh-action@v0.1.5
         with:
-          host: ${{ secrets.Oracle_Instance_IP }}      # Your Oracle Instance IP
-          username: ${{ secrets.Oracle_Username }}      # Your Oracle username
-          key: ${{ secrets.Oracle_SSH_Key }}            # Your SSH private key
+          host: ${{ secrets.ORACLE_HOST }}      # Your Oracle Instance IP
+          username: ${{ secrets.Oracle_USER }}      # Your Oracle username
+          key: ${{ secrets.Oracle_SSH_KEY }}            # Your SSH private key
           script: |
             cd /home/opc/InstagramTool/Backend  # Adjust the path to your backend
             git pull origin main       # Pull the latest changes

@@ -8,7 +8,8 @@ var login_screen = document.getElementById("login-screen");
 var register_screen = document.getElementById("register-screen");
 let uploaded_file = null;
 
-const isDevelopment = window.location.hostname === "localhost";
+const isDevelopment = window.location.hostname === "localhost"
+
 const baseUrl = isDevelopment ? "http://localhost:8383" : "http://207.211.188.250:8383";
 
 getBtn.addEventListener('click', recieveInfo)
@@ -57,7 +58,7 @@ function calcProgress(file, file_num) {
             clearInterval(interval); // Stop the interval when upload is complete
             const statusBar = document.getElementById('file' + file_num + '-status');
             const progressStatus = document.getElementById('file'+ file_num + '-percent');
-            progressStatus.innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;"><img src="/images/checkmark-svgrepo-com.svg"/></p>'
+            progressStatus.innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;"><img src="../images/checkmark-svgrepo-com.svg"/></p>'
             statusBar.textContent = file.name + " • Uploaded"
             uploaded_file = file;
         }
@@ -67,12 +68,13 @@ async function logOut(e) {
     document.getElementById("logout-btn").innerHTML = `<div class="lds-ring"><div></div><div></div><div></div><div></div>`
     const res = await fetch(baseUrl + '/logout', {
         method: 'POST',
+        credentials: 'include'
     
     })
     if (res.ok) {
         transition();
         setTimeout(() => {
-            window.location.href = '/index.html';
+            window.location.href = '../index.html';
         }, 200); // 1000 ms = 1 second
     }
 }
@@ -95,20 +97,24 @@ function toUpload(){
     switchBtn.style.left = "0px";
 };
 window.onload = async function() {
-    const res = await fetch('/protected', { credentials: 'include' })
+    const res = await fetch(baseUrl + '/protected', { 
+        method: 'GET',
+        credentials: 'include' 
+    })
     if (res.status === 401) {
         // User isnt authenticated, so redirect to login
-        window.location.href = '/index.html'; 
+        window.location.href = '../index.html'; 
     } else if (res.status === 403) {
         // Token is invalid, so redirect to login
-        window.location.href = '/index.html'; 
+        window.location.href = '../index.html'; 
     }
 };
 async function recieveInfo(e) { 
     e.preventDefault()
     document.getElementById("getInfo").innerHTML = `<div class="lds-ring"><div></div><div></div><div></div><div></div>`
     const res = await fetch(baseUrl + '/data', {
-        method: 'GET' 
+        method: 'GET',
+        credentials: 'include'
     })
     document.getElementById("getInfo").innerHTML = "Get"
     if (res.ok) {
@@ -120,7 +126,7 @@ async function recieveInfo(e) {
             const row = document.createElement('tr');
             const cell = document.createElement('td');
             const img = document.createElement('td');
-            img.innerHTML = `<a class="profile-link" target="_blank" rel="noopener noreferrer" href="${user.following_link}"><img src="/images/user.svg" width="36" height="36" alt="User Icon"></a>`;
+            img.innerHTML = `<a class="profile-link" target="_blank" rel="noopener noreferrer" href="${user.following_link}"><img src="../images/user.svg" width="36" height="36" alt="User Icon"></a>`;
             cell.textContent = user.following_id
 
             // Append the image to the cell
@@ -129,7 +135,7 @@ async function recieveInfo(e) {
             tableBody.appendChild(row);
         });
         document.getElementById("message").className = "message"
-        document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">Succesfully parsed<img src="/images/checkmark-svgrepo-com.svg"/></p>'
+        document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">Succesfully parsed<img src="../images/checkmark-svgrepo-com.svg"/></p>'
     }
     else if (res.status === 400) {
         // Displays error message
@@ -150,7 +156,8 @@ async function sendInfo(e) {
     formData.append("zipfile", uploaded_file)
     const res = await fetch(baseUrl + '/uploads', {
         method: 'POST',
-        body: formData
+        body: formData,
+        credentials: 'include'
     
     })
     if (res.ok) {
@@ -162,7 +169,7 @@ async function sendInfo(e) {
             const row = document.createElement('tr');
             const cell = document.createElement('td');
             const img = document.createElement('td');
-            img.innerHTML = `<a class="profile-link" target="_blank" rel="noopener noreferrer" href="${user.following_link}"><img src="/images/user.svg" width="36" height="36" alt="User Icon"></a>`;
+            img.innerHTML = `<a class="profile-link" target="_blank" rel="noopener noreferrer" href="${user.following_link}"><img src="../images/user.svg" width="36" height="36" alt="User Icon"></a>`;
             cell.textContent = user.following_id
             row.appendChild(img);
             row.appendChild(cell);
@@ -170,7 +177,7 @@ async function sendInfo(e) {
         });
         document.getElementById("submit").innerHTML = "Submit"
         document.getElementById("message").className = "message"
-        document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">Succesfully uploaded and parsed<img src="/images/checkmark-svgrepo-com.svg"/></p>'
+        document.getElementById("message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; align-items: center;">Succesfully uploaded and parsed<img src="../images/checkmark-svgrepo-com.svg"/></p>'
     }
     else {
         if (res.status === 401) {

@@ -6,6 +6,7 @@ const { JSDOM } = jsdom;
 const bcrypt = require('bcryptjs')
 const dotenv = require('dotenv')
 const jwt = require('jsonwebtoken')
+const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const result = dotenv.config({
     path: `.env.${process.env.NODE_ENV || 'development'}`
@@ -13,13 +14,23 @@ const result = dotenv.config({
 if (result.error) {
     throw result.error;
 }
+const allowedOrigins = [
+    'http://localhost:5500', // Your local server
+    'https://wyattmog.github.io', // GitHub Pages domain
+    'https://wyattmog.github.io/InstagramTool' // Specific repository if applicable
+];
+
 const mysql = require('mysql2')
 const app = express()
 const port = 8383
-const host = '0.0.0.0';
-app.use(express.static(process.env.ROUTE))
+const host = process.env.HOST;
 app.use(express.json())
 app.use(cookieParser())
+// console.log(result)
+app.use(cors({
+    origin: allowedOrigins, // Adjust as needed
+    credentials: true
+}))
 const storage = multer.memoryStorage({
     storage: multer.memoryStorage() ,
     limits: { fileSize: 10 * 1024 * 1024 }
