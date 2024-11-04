@@ -2,39 +2,47 @@ const express = require('express')
 const multer = require('multer')
 const jsdom = require('jsdom')
 const fs = require('fs')
+const yauzl = require('yauzl');
 const { JSDOM } = jsdom;
 const bcrypt = require('bcryptjs')
 const dotenv = require('dotenv')
 const jwt = require('jsonwebtoken')
 const cookieParser = require('cookie-parser')
-dotenv.config()
+const result = dotenv.config({
+    path: `.env.${process.env.NODE_ENV || 'development'}`
+});
+if (result.error) {
+    throw result.error;
+}
 const mysql = require('mysql2')
 const app = express()
 const port = 8383
-
-
-app.use(express.static('/Users/wyattmogelson/Coding/InstagramTool/Frontend'))
+const host = process.env.HOST || 'localhost';
+console.log(process.env.ROUTE)
+app.use(express.static(process.env.ROUTE))
 app.use(express.json())
 app.use(cookieParser())
-
 const storage = multer.memoryStorage({
     storage: multer.memoryStorage() ,
-    limits: { fileSize: 5 * 1024 * 1024 }
+    limits: { fileSize: 10 * 1024 * 1024 }
 })
 // Use enviornment variables because it prevents hard coding
 // authentication, and allows user to change the value without
-// coding it in javascript. Sensitive info like password also
-// shouldn't be hardcoded.
+// coding it in javascript.
+
+
+    // Now you can access your environment variables
+
 const pool = mysql.createPool({
     host: process.env.DB1_HOST,
     user: process.env.DB1_USER,
     password: process.env.DB1_PASSWORD,
     database: process.env.DB1_DATABASE
+    
 }).promise()
 
 const uploads = multer({storage: storage})
-// This communicates from backend to front end
-// Will use to display information after processing in sql
+// Get request that first authenticates user, then parses and sends the request information to client browser.
 app.get('/data', authenticateToken, async (req,res) => {
     const result = await parse(req.user)
     if (result[0].length === 0) {
@@ -44,40 +52,81 @@ app.get('/data', authenticateToken, async (req,res) => {
         res.json(result)
     }
 })
+// Error handler for multer in order to catch and send information back to client browser
 app.use((err, req, res, next) => {
     if (err instanceof multer.MulterError) {
         // A Multer error occurred when uploading.
-        return res.status(400).send('An error occurred during the file upload.'); // Send a generic error message
+        return res.status(400).send('An error occurred during the file upload.');
     } else if (err) {
         // An unknown error occurred when uploading.
-        return res.status(400).send('An error occurred during the request.'); // Send a generic error message
+        return res.status(400).send('An error occurred during the request.');
     }
     next();
 });
+
+// Extracts html files from the zip file
+// Puts target files in array to return
+async function extractHtml(zipBuffer, targetFiles) {
+    return new Promise((resolve, reject) => {
+    const extractedFiles = [];
+    yauzl.fromBuffer(zipBuffer, { lazyEntries: true }, (err, zipfile) => {
+        if (err) return reject(err);
+        zipfile.readEntry();
+        zipfile.on("entry", (entry) => {
+            if (targetFiles.includes(entry.fileName)) {
+                // Read the entry into memory
+                zipfile.openReadStream(entry, (err, readStream) => {
+                    if (err) return reject(err);
+                    
+                    let buffers = [];
+                    readStream.on('data', (chunk) => {
+                        buffers.push(chunk); // Collect chunks of data
+                    });
+                    readStream.on('end', () => {
+                        const htmlBuffer = Buffer.concat(buffers); // Concatenate the collected buffers
+                        extractedFiles.push({
+                            originalname: entry.fileName,
+                            buffer: htmlBuffer // Store the HTML file contents in memory
+                        });
+                        zipfile.readEntry(); // Read the next entry
+                    });
+                });
+          } else {
+            zipfile.readEntry();
+          }
+        });
+        zipfile.on('end', () => {
+            resolve(extractedFiles); // Resolve the promise with the collected HTML files
+          });
+      });
+    })
+}
 // Recieves post request from frontend
 // Puts followers file in /followers directory
 // Puts following file in /following directory
 // Uses JSDOM to parse and query and get all hyperlink content
 // For both following and follower links, puts
 // both into respective arrays.
-app.post('/uploads', authenticateToken, uploads.array('files'), async (req, res) => {
-    if (!req.files || req.files.length === 0) {
-        return res.status(500).send('No files uploaded or invalid file type.');
-    }
+app.post('/uploads', authenticateToken, uploads.single('zipfile'), async (req, res) => {
+    const zipBuffer = req.file.buffer;
+    const targetFiles = ['connections/followers_and_following/followers_1.html', 'connections/followers_and_following/following.html'];
     try {
-        const followersFile = req.files.find(file => (file.originalname === 'followers_1.html') || (file.originalname === 'followers.html'));
-        const followingFile = req.files.find(file => file.originalname === 'following.html');
+        const htmlFiles = await extractHtml(zipBuffer, targetFiles);
+        // Checks if needed files were found in zip file
+        const followersFile = htmlFiles.find(file => (file.originalname === 'connections/followers_and_following/followers_1.html'));
+        const followingFile = htmlFiles.find(file => (file.originalname === 'connections/followers_and_following/following.html'));
         if (!followersFile || !followingFile) {
             return res.status(500).send('Required files are missing.');
         }
         await deleteColumns(req.user)
+        // Promise that is used to inject user information information into sql database
         await new Promise( async (resolve, reject) => {
             try {
                 const data = followersFile.buffer.toString("utf-8")
                 const dom = new JSDOM(data);
                 const links = dom.window.document.querySelectorAll("a");
                 for (let i = 0; i < links.length; i++) {
-                    await insertFollowers(links[i].textContent, req.user)
+                    await insertFollowers(links[i].textContent,links[i].href, req.user)
                 }
                 resolve()
             }
@@ -85,13 +134,14 @@ app.post('/uploads', authenticateToken, uploads.array('files'), async (req, res)
                 reject(err)
             }
         })
+        // Promise that is used to inject user information information into sql database
         await new Promise( async (resolve, reject) => {
             try {
                 const data = followingFile.buffer.toString("utf-8")
                 const dom = new JSDOM(data);
                 const links = dom.window.document.querySelectorAll("a");
                 for (let i = 0; i < links.length; i++) {
-                    await insertFollowing(links[i].textContent, req.user)
+                    await insertFollowing(links[i].textContent, links[i].href, req.user)
                 }
                 resolve()
             }
@@ -103,25 +153,31 @@ app.post('/uploads', authenticateToken, uploads.array('files'), async (req, res)
         // const result = await parse()
         res.json(result) 
     }
+    // Various error handling
     catch(err) {
+        console.log(err)
         return res.status(500).send('Upload error');
     }}, (err, req, res, next) => {
         if (err instanceof multer.MulterError) {
+            console.log(err)
             // A Multer error occurred when uploading.
-            return res.status(500).send('An error occurred during the file upload.'); // Send a generic error message
+            return res.status(500).send('An error occurred during the file upload.');
         } else if (err) {
             // An unknown error occurred when uploading.
-            return res.status(500).send('An error occurred during the request.'); // Send a generic error message
+            return res.status(500).send('An error occurred during the request.'); 
         } else {
           // Handle other errors
           return res.status(500).json({ error: 'Internal server error' });
         }
-    }// res.json({status: 'form data recieved' }) 
+    }
 )
+// Handles user logout
 app.post('/logout', (req, res) => {
     res.clearCookie('auth_token'); // Clear the auth_token cookie
     res.json({ message: 'Logout successful' });
 });
+// Handles user registration
+// Stores information in database table for easy and secure lookup
 app.post('/register', uploads.none(), async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -129,6 +185,7 @@ app.post('/register', uploads.none(), async (req, res) => {
         if (result[0].length > 0) {
             return res.status(400).send('Username already taken')
         }
+        // Use bcrypt in order to store hashed version of password for increased security
         const hashedPassword = await bcrypt.hash(password, 10)
         await pool.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword])
         res.json('User registered successfully')
@@ -137,6 +194,7 @@ app.post('/register', uploads.none(), async (req, res) => {
         return res.status(500).send('Database error');
     }
 })
+// Checks if user is authenticated
 app.get('/protected', authenticateToken, (req, res) => {
     res.sendStatus(200);
 });
@@ -145,13 +203,11 @@ app.post('/login', uploads.none(), async (req, res) => {
         const username = req.body.username;
         const password = req.body.password; 
         const remember = req.body.remember;     
-
         // Find the user by username
         const result = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
         if (result[0].length === 0) {
             return res.status(400).send('User not found');
         }
-
         // Compare passwords
         const user = result[0];
         const isMatch = await bcrypt.compare(password, user[0].password);
@@ -159,38 +215,35 @@ app.post('/login', uploads.none(), async (req, res) => {
             return res.status(400).send('Invalid password')
         }
         const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET)
+        // Sets expiration to 1 week and one hour respectively
         const maxAges = String(remember) == "true" ? 604800000 : 3600000;
         res.cookie('auth_token', accessToken, {
-            httpOnly: true,     // Prevents JavaScript from accessing the cookie (helps prevent XSS)     // Cookie is only sent over HTTPS (use `false` during local development)
+            httpOnly: true,     // Prevents JavaScript from accessing the cookie (helps prevent XSS)   
             sameSite: 'Strict', // Prevents the cookie from being sent with cross-site requests (helps prevent CSRF)
             maxAge: maxAges     // Sets cookie expiration time 
         })
-        res.json( {message: "login sucess"})
+        res.json( {message: "login success"})
     } catch (err) {
-        console.error('Error during login:', err); // Log the error for debugging
         return res.status(500).send('Database error');
     }
 });
-app.listen(port, () => console.log(`server has started on port: ${port}`))
-
-function insertFollowing(name, user){
+// Inserts user information into database
+function insertFollowing(name, user, link){
     return pool.query(`
-    INSERT INTO following (user_id, following_id)
-    VALUES (?, ?)
-    `, [user, name])
+    INSERT INTO following (user_id, following_link, following_id)
+    VALUES (?, ?, ?)
+    `, [link, user, name])
 }
-
+// Parses user information from database and stores in dictionary to be returned to client browser
 function parse(userId){
-    return pool.query(`SELECT following_id 
+    return pool.query(`SELECT following_id, following_link
     FROM following
     WHERE user_id = ? AND following_id NOT IN (SELECT follower_id FROM followers WHERE user_id = ?);
     `, [userId, userId])
 }
-
+// Authentices user information 
 function authenticateToken(req, res, next) {
     const token = req.cookies.auth_token
-    // const authHeader = req.headers['authorization']
-    // const token = authHeader && authHeader.split(' ')[1]
     if (token == null) {
         return res.sendStatus(401)
     }
@@ -202,6 +255,7 @@ function authenticateToken(req, res, next) {
         next()
     })
 }
+// Deletes user information upon new upload in order to save space 
 function deleteColumns(user) {
     return pool.query(`
         DELETE FROM following WHERE user_id = ?
@@ -212,9 +266,14 @@ function deleteColumns(user) {
         `, [user]);
     });
 }
-function insertFollowers(name, user){
+// Inserts user information into database
+function insertFollowers(name, link, user){
     return pool.query(`
-    INSERT INTO followers (user_id, follower_id)
-    VALUES (?, ?)
-    `, [user, name])
+    INSERT INTO followers (user_id, follower_link, follower_id)
+    VALUES (?, ?, ?)
+    `, [user, link, name])
 }
+
+app.listen(port, host, () => {
+    console.log(`Server is running on http://${host}:${port}`);
+  });

@@ -15,7 +15,7 @@
         <div class = "form-box">
             <div class = "button-box transition">
                 <div id="switch-btn"></div>
-                <button class = "toggle-btn" id = "to-login" onclick="toLogin()">Login</button>
+                <button class = "toggle-btn" id = "to-login" onclick="toLogin()">Login&nbsp;&nbsp;&nbsp;</button>
                 <button class =  "toggle-btn" id = "to-register" onclick="toRegister()">Register</button>
             </div>
         <form id = "login-screen" class="input-group transition">
@@ -25,198 +25,16 @@
             <p class = "err-message" id = "login-message"><br></p>
             <input type="checkbox" id="remember" class="check-box"><span>Keep me logged in</span>
             <button class = "submit-btn" id = "login">Login</button>
-            <!-- <p>Haven't made an account?</p><a href="views/register.html">Register</a> -->
         </form>
         <form id = "register-screen" class="input-group transition">
             <input class = "input-field", type ="text" id = "register-username" placeholder="Enter New Username">
             <br><br>
             <input class = "input-field" type ="text" id = "register-password"  placeholder="Enter New Password">
             <p class = "err-message" id = "register-message"><br></p>
-            <input type="checkbox" class="check-box" id = "terms"><span>I agree to the terms & conditions</span>
+            <input type="checkbox" class="check-box" id = "terms"><span id = "check-label">I agree to the terms & conditions</span>
             <button class = "submit-btn" id = "register">Register</button>
         </form>
-        <script>
-            const registerBtn = document.getElementById("register");
-            const loginBtn = document.getElementById("login");
-            const registerPassword = document.getElementById("register-password");
-            const registerUsername = document.getElementById("register-username");
-            const loginPassword = document.getElementById("login-password");
-            const loginUsername = document.getElementById("login-username");
-            const baseUrl = 'http://localhost:8383';
-            loginBtn.addEventListener('click', login);
-            registerBtn.addEventListener('click', register);
-            registerUsername.addEventListener('input', resetRegister)
-            registerPassword.addEventListener('input', resetRegister)
-            loginUsername.addEventListener('input', resetLogin)
-            loginPassword.addEventListener('input', resetLogin)
-            function spawnHeart(event){
-                const newHeart = document.createElement('div');
-                newHeart.classList.add('heart')
-                // const x = event.clientX; // X coordinate of the click
-                // const y = event.clientY;
-                // console.log(x,y)
-                // newHeart.style.left = x + 'px';
-                // newHeart.style.top = y + 'px';
-                newHeart.style.left = Math.random() * window.innerWidth + 'px';
-                newHeart.style.top = .9 * window.innerHeight + 'px';
-                document.getElementById("heart-loc").appendChild(newHeart);
-
-                setTimeout(() => {
-                newHeart.classList.add('hidden');
-                // Optional: remove from DOM after it is invisible
-                setTimeout(() => newHeart.remove(), 500); 
-                }, 3500);
-            }
-
-            // document.addEventListener('click', spawnHeart);
-            function startSpawning() {
-
-                // Spawn 3 divs every second
-                intervalId = setInterval(() => {
-                for (let i = 0; i < 1; i++) {
-                    spawnHeart();
-                }
-                }, 400); // 1000 ms = 1 second
-            }
-            // window.onload = function() {
-            //     startSpawning();
-            // };
-            window.onload = async function() {
-                const res = await fetch('/protected', { credentials: 'include' })
-                if (res.status === 401 || res.status === 403) {
-                    // User is not authenticated
-                    // alert('You are not authorized to access this page.');
-                    startSpawning();
-                } else if (res.ok) {
-                    // User is authenticated; proceed normally
-                    window.location.href = 'views/main.html'; // Redirect to login page
-                }
-            }
-            var login_screen = document.getElementById("login-screen");
-            var register_screen = document.getElementById("register-screen");
-            var switchBtn = document.getElementById("switch-btn");
-            function toRegister(){
-                login_screen.style.left = "-400px";
-                register_screen.style.left = "50px";
-                switchBtn.style.left = "110px";
-            };
-            function toLogin(){
-                login_screen.style.left = "50px";
-                register_screen.style.left = "450px";
-                switchBtn.style.left = "0px";
-            };
-            function transition(){
-                // console.log("WOWOWOWW")
-                const heartElements = document.querySelectorAll('.heart');
-                const bodyElements = document.querySelectorAll('.transition');
-                heartElements.forEach(element => {
-                    element.style.opacity = 0;
-                });
-                bodyElements.forEach(element => {
-                    element.classList.add('fade');
-                })
-
-            }
-            function resetLogin() {
-                // console.log("reset")
-                loginPassword.style.borderBottom = '#999 solid 2px'
-                loginUsername.style.borderBottom = '#999 solid 2px'
-            }
-            function resetRegister() {
-                registerUsername.style.borderBottom = '#999 solid 2px'
-                registerPassword.style.borderBottom = '#999 solid 2px'
-            }
-            async function register(e) {
-                e.preventDefault();
-                if (!document.getElementById("terms").checked) {
-                    return;
-                }
-                if (!registerUsername.value && !registerPassword.value) {
-                    registerUsername.style.borderBottom = 'rgb(255, 0, 0) solid 2px'
-                    registerPassword.style.borderBottom = 'rgb(255, 0, 0) solid 2px'
-                    document.getElementById("register-message").textContent = "Username and Password cannot be blank";
-                    return;
-                }
-                else if (!registerUsername.value) {
-                    registerUsername.style.borderBottom = 'rgb(255, 0, 0) solid 2px'
-                    document.getElementById("register-message").textContent = "Username cannot be blank";
-                    return;
-                }
-                else if (!registerPassword.value) {
-                    registerPassword.style.borderBottom = 'rgb(255, 0, 0) solid 2px'
-                    document.getElementById("register-message").textContent = "Password cannot be blank";
-                    return;
-                }
-                const formData = new FormData();
-                formData.append("password", registerPassword.value);
-                formData.append("username", registerUsername.value);
-                const res = await fetch(baseUrl + '/register', {
-                    method: 'POST',
-                    body: formData
-                
-                });
-                if (res.ok) {
-                    // display registered
-                    document.getElementById("register-message").className = "message"
-                    document.getElementById("register-message").innerHTML = '<p style="line-height: 24px; font-size: 16px; display: flex; justify-content:center;">Succesful Registered<img src="/images/checkmark-svgrepo-com.svg"/></p>'
-                }
-                else {
-                    if (res.status === 400) {
-                        registerUsername.style.borderBottom = 'rgb(255, 0, 0) solid 2px'
-                        document.getElementById("register-message").className = "err-message"
-                        document.getElementById("register-message").textContent = "Username already taken";
-
-                    }
-                    else {
-                        // Display error during registeration, try again later
-                        document.getElementById("register-message").className = "err-message"
-                        document.getElementById("register-message").textContent = "Error during registration, try again later";
-                    };
-                };
-                // const result = await res.json(); // Or use .json() if the server responds with JSON
-                // console.log(result);
-            };
-            async function login(e) {
-                e.preventDefault();
-                if (!loginUsername.value || !loginPassword.value) {
-                    loginUsername.style.borderBottom = 'rgb(255, 0, 0) solid 2px'
-                    loginPassword.style.borderBottom = 'rgb(255, 0, 0) solid 2px'
-                    document.getElementById("login-message").textContent = "Incorrect username or password"
-                    return;
-                };
-                const formData = new FormData();
-                formData.append("password", loginPassword.value);
-                formData.append("username", loginUsername.value);
-                formData.append("remember", document.getElementById("remember").checked);
-                const res = await fetch(baseUrl + '/login', {
-                    method: 'POST',
-                    body: formData,
-                  
-                });
-                if (res.ok) {
-                    transition();
-                    clearInterval(intervalId);
-                    setTimeout(() => {
-                        window.location.href = 'views/main.html';
-                    }, 200); // 1000 ms = 1 second
-                }
-                else {
-                    if (res.status === 400) {
-                        // Display username or password incorrect
-                        loginUsername.style.borderBottom = 'rgb(255, 0, 0) solid 2px'
-                        loginPassword.style.borderBottom = 'rgb(255, 0, 0) solid 2px'
-                        document.getElementById("login-message").textContent = "Incorrect username or password"
-                    }
-                    else {
-                        document.getElementById("login-message").textContent = "Error during login, try again later"
-                        // Display error during login, try again later
-                    };
-                };
-            };
-        </script>
-    </div>
-    <div class = "heart-transition" id = "heart-loc">
-
+        <script src="js/index.js"></script>
     </div>
 </body>
 </html>
