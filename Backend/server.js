@@ -1,7 +1,6 @@
 const express = require('express')
 const multer = require('multer')
 const jsdom = require('jsdom')
-const fs = require('fs')
 const yauzl = require('yauzl');
 const { JSDOM } = jsdom;
 const bcrypt = require('bcryptjs')
@@ -17,8 +16,7 @@ if (result.error) {
 const mysql = require('mysql2')
 const app = express()
 const port = 8383
-const host = process.env.HOST || 'localhost';
-console.log(process.env.ROUTE)
+const host = '0.0.0.0';
 app.use(express.static(process.env.ROUTE))
 app.use(express.json())
 app.use(cookieParser())
