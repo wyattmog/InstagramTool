@@ -1,42 +1,40 @@
-name: CI/CD Pipeline
+name: Deploy to GitHub Pages and Oracle Compute Instance
 
 on:
   push:
     branches:
-      - main  # Change this to your main branch name
-  pull_request:
-    branches:
-      - main  # This will trigger the CI/CD on pull requests to the main branch
+      - main  # Trigger deployment on pushes to the main branch
 
 jobs:
-  build:
+  deploy-frontend:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '16'  # Change this to your required Node.js version
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./Frontend  # Directory of your static files
+          publish_branch: main      # Use main branch for GitHub Pages
 
-    - name: Install dependencies
-      run: npm install
+  deploy-backend:
+    runs-on: ubuntu-latest
 
-    - name: Run tests
-      run: npm test  # Adjust this if your test command is different
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Build application
-      run: npm run build  # Adjust if your build command is different
-
-    - name: Deploy to Oracle Compute
-      env:
-        ORACLE_USER: ${{ secrets.ORACLE_USER }}  # Your Oracle Compute username
-        ORACLE_HOST: ${{ secrets.ORACLE_HOST }}  # Your Oracle Compute instance IP
-        ORACLE_SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}  # Your SSH private key
-      run: |
-        echo "${ORACLE_SSH_KEY}" > private_key.pem
-        chmod 600 private_key.pem
-        scp -i private_key.pem -o StrictHostKeyChecking=no -r ./build/* ${ORACLE_USER}@${ORACLE_HOST}:/path/to/your/deployment/directory
-        ssh -i private_key.pem -o StrictHostKeyChecking=no ${ORACLE_USER}@${ORACLE_HOST} 'cd /path/to/your/deployment/directory && npm install && pm2 restart your-app-name'  # Adjust this command as necessary
+      - name: SSH to Oracle Instance and Deploy Backend
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.Oracle_Instance_IP }}      # Your Oracle Instance IP
+          username: ${{ secrets.Oracle_Username }}      # Your Oracle username
+          key: ${{ secrets.Oracle_SSH_Key }}            # Your SSH private key
+          script: |
+            cd /home/opc/InstagramTool/Backend  # Adjust the path to your backend
+            git pull origin main       # Pull the latest changes
+            npm install    # Install only production dependencies
+            pm2 restart nodejs-server   # Restart your Node.js app with PM2
