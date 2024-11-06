@@ -3,6 +3,8 @@ const multer = require('multer')
 const jsdom = require('jsdom')
 const yauzl = require('yauzl');
 const { JSDOM } = jsdom;
+const https = require('https')
+const fs = require('fs')
 const bcrypt = require('bcryptjs')
 const dotenv = require('dotenv')
 const jwt = require('jsonwebtoken')
@@ -24,7 +26,7 @@ const allowedOrigins = isProduction ?
 const mysql = require('mysql2')
 const app = express()
 const port = 8383
-const host = process.env.HOST;
+// const host = process.env.HOST;
 app.use(express.json())
 app.use(cookieParser())
 // console.log(result)
@@ -285,6 +287,18 @@ function insertFollowers(name, link, user){
     `, [user, link, name])
 }
 
-app.listen(port, host, () => {
-    console.log(`Server is running on http://${host}:${port}`);
-  });
+
+if (isProduction) {
+    const options = {
+      key: fs.readFileSync('/etc/letsencrypt/live/instagram-tool.duckdns.org/privkey.pem'),
+      cert: fs.readFileSync('/etc/letsencrypt/live/instagram-tool.duckdns.org/fullchain.pem')
+    };
+  
+    https.createServer(options, app).listen(port, '0.0.0.0', () => {
+      console.log('Server is running on https://yourdomain.duckdns.org:8383');
+    });
+} else {
+    app.listen(port, 'localhost', () => {
+      console.log('Server is running on http://localhost:8383');
+    });
+}
