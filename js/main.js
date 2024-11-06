@@ -10,7 +10,7 @@ let uploaded_file = null;
 
 const isDevelopment = window.location.hostname === "localhost"
 
-const baseUrl = isDevelopment ? "http://localhost:8383" : "http://207.211.188.250:8383";
+const baseUrl = isDevelopment ? "http://localhost:8383" : "https://207.211.188.250:8383";
 
 getBtn.addEventListener('click', recieveInfo)
 submitBtn.addEventListener('click', sendInfo)
