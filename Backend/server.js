@@ -19,7 +19,7 @@ if (result.error) {
 const isProduction = process.env.NODE_ENV === 'production';
 
 const allowedOrigins = isProduction ? 
-    ['https://your-production-domain.com'] : 
+    ['https://wyattmog.github.io'] : 
     ['http://localhost:5500'];
 
 
@@ -185,7 +185,13 @@ app.post('/uploads', authenticateToken, uploads.single('zipfile'), async (req, r
 )
 // Handles user logout
 app.post('/logout', (req, res) => {
-    res.clearCookie('auth_token'); // Clear the auth_token cookie
+    res.clearCookie('auth_token', {
+        httpOnly: true,        // Ensures the cookie is not accessible via JavaScript
+        secure: isProduction,          // Ensures the cookie is only sent over HTTPS
+        sameSite: 'None',      // Ensures the cookie is sent with cross-site requests
+        domain: '.instagram-tool.duckdns.org',  // Make sure the domain has a dot in front
+        path: '/',             // Ensure this matches the path where the cookie was set
+    });
     res.json({ message: 'Logout successful' });
 });
 // Handles user registration
@@ -231,8 +237,9 @@ app.post('/login', uploads.none(), async (req, res) => {
         const maxAges = String(remember) == "true" ? 604800000 : 3600000;
         res.cookie('auth_token', accessToken, {
             httpOnly: true,
-            sameSite: 'Strict',
+            sameSite: 'None',
             maxAge: maxAges, // Example maxAge
+            domain: 'instagram-tool.duckdns.org',
             secure: isProduction, // Set secure cookies only in production
         });
         res.json( {message: "login success"})
@@ -257,6 +264,7 @@ function parse(userId){
 // Authentices user information 
 function authenticateToken(req, res, next) {
     const token = req.cookies.auth_token
+    console.log(req.cookies.auth_token)
     if (token == null) {
         return res.sendStatus(401)
     }
@@ -286,7 +294,6 @@ function insertFollowers(name, link, user){
     VALUES (?, ?, ?)
     `, [user, link, name])
 }
-
 
 if (isProduction) {
     const options = {
