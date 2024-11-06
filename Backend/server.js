@@ -20,12 +20,6 @@ const allowedOrigins = isProduction ?
     ['https://your-production-domain.com'] : 
     ['http://localhost:5500'];
 
-const cookieOptions = {
-    httpOnly: true,
-    sameSite: 'Strict',
-    maxAge: 3600000, // Example maxAge
-    secure: isProduction, // Set secure cookies only in production
-};
 
 const mysql = require('mysql2')
 const app = express()
@@ -233,7 +227,12 @@ app.post('/login', uploads.none(), async (req, res) => {
         const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET)
         // Sets expiration to 1 week and one hour respectively
         const maxAges = String(remember) == "true" ? 604800000 : 3600000;
-        res.cookie('auth_token', accessToken, cookieOptions)
+        res.cookie('auth_token', accessToken, {
+            httpOnly: true,
+            sameSite: 'Strict',
+            maxAge: maxAges, // Example maxAge
+            secure: isProduction, // Set secure cookies only in production
+        });
         res.json( {message: "login success"})
     } catch (err) {
         return res.status(500).send('Database error');
