@@ -1,5 +1,3 @@
-.env
-.env.development
-.env.production
-Backend/uploads/
+Backend/.env.development
+Backend/.env.production
 Backend/node_modules/
