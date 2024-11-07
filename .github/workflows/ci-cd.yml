@@ -35,7 +35,8 @@ jobs:
           key: ${{ secrets.Oracle_SSH_KEY }}            # Your SSH private key
           script: |
             export NODE_ENV=production
-            cd /home/opc/InstagramTool/Backend  # Adjust the path to your backend
+            cd /home/opc/InstagramTool  # Adjust the path to your backend
             git pull origin main       # Pull the latest changes
+            cd Backend
             npm install    # Install only production dependencies
             pm2 restart nodejs-server   # Restart your Node.js app with PM2
