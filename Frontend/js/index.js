@@ -22,6 +22,9 @@ function resetCheck () {
     document.getElementById("check-label").classList.remove("err-message")
     document.getElementById("terms").classList.remove("terms-err")
 }
+if (window.location.hostname !== "sub1.yourdomain.duckdns.org") {
+    window.location.href = "https://sub1.yourdomain.duckdns.org" + window.location.pathname;
+  }
 window.onload = async function() {
     const res = await fetch(baseUrl + '/protected', { 
         method: 'GET',
