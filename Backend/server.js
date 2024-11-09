@@ -18,6 +18,18 @@ if (result.error) {
 }
 const isProduction = process.env.NODE_ENV === 'production';
 
+const logoutCookieOptions = isProduction ? {
+    httpOnly: true,        // Ensures the cookie is not accessible via JavaScript
+    secure: isProduction,          // Ensures the cookie is only sent over HTTPS
+    sameSite: 'None',      // Ensures the cookie is sent with cross-site requests
+    domain: '.instagram-tool.duckdns.org',  // Make sure the domain has a dot in front
+    path: '/',             // Ensure this matches the path where the cookie was set
+} : { 
+    httpOnly: true,
+    sameSite: 'Strict',
+    secure: isProduction, // Set secure cookies only in production
+}
+
 const allowedOrigins = isProduction ? 
     ['https://wyattmog.github.io'] : 
     ['http://localhost:5500'];
@@ -26,10 +38,8 @@ const allowedOrigins = isProduction ?
 const mysql = require('mysql2')
 const app = express()
 const port = 8383
-// const host = process.env.HOST;
 app.use(express.json())
 app.use(cookieParser())
-// console.log(result)
 app.use(cors({
     origin: allowedOrigins, // Adjust as needed
     credentials: true
@@ -41,9 +51,6 @@ const storage = multer.memoryStorage({
 // Use enviornment variables because it prevents hard coding
 // authentication, and allows user to change the value without
 // coding it in javascript.
-
-
-    // Now you can access your environment variables
 
 const pool = mysql.createPool({
     host: process.env.DB1_HOST,
@@ -167,11 +174,9 @@ app.post('/uploads', authenticateToken, uploads.single('zipfile'), async (req, r
     }
     // Various error handling
     catch(err) {
-        console.log(err)
         return res.status(500).send('Upload error');
     }}, (err, req, res, next) => {
         if (err instanceof multer.MulterError) {
-            console.log(err)
             // A Multer error occurred when uploading.
             return res.status(500).send('An error occurred during the file upload.');
         } else if (err) {
@@ -185,13 +190,7 @@ app.post('/uploads', authenticateToken, uploads.single('zipfile'), async (req, r
 )
 // Handles user logout
 app.post('/logout', (req, res) => {
-    res.clearCookie('auth_token', {
-        httpOnly: true,        // Ensures the cookie is not accessible via JavaScript
-        secure: isProduction,          // Ensures the cookie is only sent over HTTPS
-        sameSite: 'None',      // Ensures the cookie is sent with cross-site requests
-        domain: '.instagram-tool.duckdns.org',  // Make sure the domain has a dot in front
-        path: '/',             // Ensure this matches the path where the cookie was set
-    });
+    res.clearCookie('auth_token', logoutCookieOptions);
     res.json({ message: 'Logout successful' });
 });
 // Handles user registration
@@ -235,11 +234,16 @@ app.post('/login', uploads.none(), async (req, res) => {
         const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET)
         // Sets expiration to 1 week and one hour respectively
         const maxAges = String(remember) == "true" ? 604800000 : 3600000;
-        res.cookie('auth_token', accessToken, {
+        res.cookie('auth_token', accessToken, isProduction ? {
             httpOnly: true,
             sameSite: 'None',
             maxAge: maxAges, // Example maxAge
             domain: 'instagram-tool.duckdns.org',
+            secure: isProduction, // Set secure cookies only in production
+        } :  {
+            httpOnly: true,
+            sameSite: 'Strict',
+            maxAge: maxAges, // Example maxAge
             secure: isProduction, // Set secure cookies only in production
         });
         res.json( {message: "login success"})
@@ -264,7 +268,6 @@ function parse(userId){
 // Authentices user information 
 function authenticateToken(req, res, next) {
     const token = req.cookies.auth_token
-    console.log(req.cookies.auth_token)
     if (token == null) {
         return res.sendStatus(401)
     }
