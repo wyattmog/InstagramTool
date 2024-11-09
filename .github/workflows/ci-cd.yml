@@ -5,6 +5,10 @@ on:
     branches:
       - main  # Trigger deployment on pushes to the main branch
 
+permissions:
+  contents: read  # Allow reading the content of the repository
+  id-token: write  # Allow writing the ID token required for deployment
+  
 jobs:
   deploy-frontend:
     runs-on: ubuntu-latest
