@@ -22,9 +22,10 @@ function resetCheck () {
     document.getElementById("check-label").classList.remove("err-message")
     document.getElementById("terms").classList.remove("terms-err")
 }
-if (window.location.hostname !== "instagramtoolfront.duckdns.org") {
+if (window.location.hostname !== "instagramtoolfront.duckdns.org" || window.location.hostname !== "localhost") {
+    // Redirect to HTTPS and the desired subdomain
     window.location.href = "https://instagramtoolfront.duckdns.org" + window.location.pathname;
-  }
+}
 window.onload = async function() {
     const res = await fetch(baseUrl + '/protected', { 
         method: 'GET',
