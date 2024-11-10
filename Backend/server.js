@@ -31,8 +31,7 @@ const logoutCookieOptions = isProduction ? {
 }
 
 const allowedOrigins = isProduction ? 
-    ['https://instagramtoolfront.duckdns.org']
-    ['https://wyattmog.github.io'] : 
+    ['https://instagramtoolfront.duckdns.org', 'https://wyattmog.github.io'] : 
     ['http://localhost:5500'];
 
 
