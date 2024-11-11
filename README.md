@@ -12,11 +12,13 @@ Unfollowers Tracker is a secure web application that helps you track who unfollo
    - You’ll receive an email from Instagram with the subject **"Your Meta information download is ready"**. Open the email, follow the link, and download the ZIP file to your device.
 
 2. **Upload to Unfollowers Tracker**:
-   - Visit **Unfollowerstracker.com** and click **"Discover Unfollowers"**.
+   - Register an account (no email required, just for authentication and protecting your information) and then login.
+   - Visit **instagram-tool.duckdns.org** and click **"Upload"**.
    - Select the ZIP file downloaded from Instagram and upload it to the tool.
 
-3. **View and Retrieve Results**:
-   - Click **"Discover Unfollowers"** to instantly see accounts that no longer follow you.
+4. **View and Retrieve Results**:
+   - Click **"Output"** to instantly see accounts that no longer follow you.
+   - Can click on the profile icon next to the name to take you to their profile.
    - **Retrieve Information Anytime**: After uploading, you can log in at any time to review unfollowers information, without needing to re-upload the data.
 
 ## Key Features
@@ -41,4 +43,3 @@ To use Unfollowers Tracker:
 ---
 
 Discover who’s not following you back in just a few clicks!
-
