@@ -8,7 +8,7 @@ const registerUsername = document.getElementById("register-username");
 const loginPassword = document.getElementById("login-password");
 const loginUsername = document.getElementById("login-username");
 const isDevelopment = window.location.hostname === "localhost"
-const baseUrl = isDevelopment ? "http://localhost" : "https://instagram-tool.duckdns.org";
+const baseUrl = isDevelopment ? "http://localhost:8383" : "https://instagram-tool.duckdns.org";
 
 // Call the function to get the base URL
 loginBtn.addEventListener('click', login);
