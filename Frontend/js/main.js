@@ -10,7 +10,7 @@ let uploaded_file = null;
 
 const isDevelopment = window.location.hostname === "localhost"
 
-const baseUrl = isDevelopment ? "http://localhost:8383" : "https://instagram-tool.duckdns.org:8383";
+const baseUrl = isDevelopment ? "http://localhost" : "https://instagram-tool.duckdns.org";
 
 getBtn.addEventListener('click', recieveInfo)
 submitBtn.addEventListener('click', sendInfo)

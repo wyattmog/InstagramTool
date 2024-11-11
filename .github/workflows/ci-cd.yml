@@ -6,20 +6,7 @@ on:
       - main  # Trigger deployment on pushes to the main branch
 
 jobs:
-  deploy-frontend:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./Frontend  # Directory of your static files
-          publish_branch: gh-pages      # Use main branch for GitHub Pages
-
+  
   deploy-backend:
     runs-on: ubuntu-latest
 
