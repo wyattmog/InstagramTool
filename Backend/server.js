@@ -38,6 +38,7 @@ const allowedOrigins = isProduction ?
 const mysql = require('mysql2')
 const app = express()
 const port = 8383
+app.use(express.static(process.env.ROUTE))
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
