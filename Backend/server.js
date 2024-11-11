@@ -31,13 +31,13 @@ const logoutCookieOptions = isProduction ? {
 }
 
 const allowedOrigins = isProduction ? 
-    'https://instagramtoolfront.duckdns.org' : 
-    'http://localhost:5500';
+    'https://instagram-tool.duckdns.org' : 
+    'http://localhost:80';
 
 
 const mysql = require('mysql2')
 const app = express()
-const port = 8383
+const port = isProduction ? 443 : 80;
 app.use(express.static(process.env.ROUTE))
 app.use(express.json())
 app.use(cookieParser())
@@ -170,7 +170,6 @@ app.post('/uploads', authenticateToken, uploads.single('zipfile'), async (req, r
             }
         })
         const result = await parse(req.user)
-        // const result = await parse()
         res.json(result) 
     }
     // Various error handling
@@ -306,10 +305,10 @@ if (isProduction) {
     };
   
     https.createServer(options, app).listen(port, '0.0.0.0', () => {
-      console.log('Server is running on https://yourdomain.duckdns.org:8383');
+      console.log('Server is running on https://instagram-tool.duckdns.org:443}');
     });
 } else {
     app.listen(port, '0.0.0.0', () => {
-      console.log('Server is running on http://localhost:8383');
+      console.log('Server is running on http://localhost:80');
     });
 }
