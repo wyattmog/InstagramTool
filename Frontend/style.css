@@ -1,14 +1,14 @@
 *{
     margin:0;
     padding:0;
-    font-family: "Baskerville", sans-serif;
+    font-family: "Futura", sans-serif;
     
 }
 body{
     background-color:whitesmoke;
 }
 .header{
-    margin-top: 20px;
+    margin-top: 15px;
     height: 30px;
     display: flex;
     justify-content: space-between;
@@ -55,6 +55,7 @@ body {
 .toggle-btn{
     padding: 10px 30px;
     cursor: pointer;
+    color: black;
     background: transparent;
     border: 0;
     border-radius: 10px;
@@ -103,6 +104,7 @@ body {
     cursor: pointer;
     display: block;
     margin: auto;
+    color: black;
     box-shadow: 0 0 20px 9px #ff24241f;
     background: rgb(255, 0, 0, 0.7);
     border:0;
