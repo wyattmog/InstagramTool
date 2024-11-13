@@ -2,12 +2,13 @@
     margin:0;
     padding:0;
     font-family: "Baskerville", sans-serif;
+    
 }
 body{
     background-color:whitesmoke;
 }
 .header{
-    margin-top: 25px;
+    margin-top: 20px;
     height: 30px;
     display: flex;
     justify-content: space-between;
@@ -29,7 +30,7 @@ body {
     background-attachment: fixed;
     background-image: url('images/backround.svg');
     background-size: cover;
-    background-repeat: no-repeat; 
+    /* background-repeat: no-repeat;  */
     background-position: bottom 100%; 
 }
 .form-box{
@@ -40,16 +41,15 @@ body {
     position: relative;
     justify-content: center;
     margin: 6% auto;
-    background: #fff;
+    outline: #fff;
     padding: 5px;
     border-radius: 60px;
-    box-shadow: 0 0 20px 9px #ff61241f;
 }
 .button-box{
     width:220px;
     margin:35px auto;
     position: relative;
-    box-shadow: 0 0 20px 9px #ff61241f;
+    box-shadow: 0 0 20px 9px #ff24241f;
     border-radius: 10px;
 }
 .toggle-btn{
@@ -103,7 +103,7 @@ body {
     cursor: pointer;
     display: block;
     margin: auto;
-    box-shadow: 0 0 20px 9px #ff61241f;
+    box-shadow: 0 0 20px 9px #ff24241f;
     background: rgb(255, 0, 0, 0.7);
     border:0;
     outline:none;
@@ -207,7 +207,7 @@ input[type="file"]{
     margin: 10px 10px 30px 0;
 }
 #login-screen{
-    left:58px;
+    left:54px;
 }
 #register-screen{
     left:458px;
