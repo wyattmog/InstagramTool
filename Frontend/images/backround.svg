@@ -1,4 +1,4 @@
-<svg width="100%" height="100%" viewBox="0 0 1440 600" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 1440 600" xmlns="http://www.w3.org/2000/svg">
   <style>
     .wave1 {
       animation: wavePeakMove1 7s linear infinite;
@@ -78,7 +78,7 @@
   </style>
 
   <!-- First Wave (Lower on screen) -->
-  <path d="M 0,600 L 0,380 C 150,400 300,460 450,440 C 600,420 750,460 900,440 C 1050,420 1200,400 1440,420 L 1440,600 L 0,600 Z" class="wave1"></path>
+  <path d="M 0,600 L 0,400 C 150,400 300,460 450,440 C 600,420 750,460 900,440 C 1050,420 1200,400 1440,420 L 1440,600 L 0,600 Z" class="wave1"></path>
 
   <!-- Second Wave (Lower on screen) -->
   <path d="M 0,600 L 0,420 C 150,400 300,480 450,460 C 600,440 750,480 900,460 C 1050,440 1200,420 1440,440 L 1440,600 L 0,600 Z" class="wave2"></path>
