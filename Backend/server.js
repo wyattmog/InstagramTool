@@ -305,7 +305,7 @@ if (isProduction) {
     };
   
     https.createServer(options, app).listen(port, '0.0.0.0', () => {
-      console.log('Server is running on https://instagram-tool.duckdns.org:8383');
+      console.log('Server is running on https://instagram-tool.duckdns.org');
     });
 } else {
     app.listen(port, 'localhost', () => {
